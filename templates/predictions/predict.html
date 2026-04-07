@@ -1,0 +1,277 @@
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<style>
+  .symptom-search-box { position: relative; }
+  .symptom-search-box input { border-radius: 10px; padding-left: 42px; }
+  .symptom-search-box .search-icon { position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#94a3b8; }
+  .symptoms-grid { display: flex; flex-wrap: wrap; gap: 8px; max-height: 380px; overflow-y: auto; padding: 4px; }
+  .symptoms-grid::-webkit-scrollbar { width: 4px; }
+  .symptoms-grid::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 2px; }
+  .symptoms-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+  .selected-symptoms-box {
+    min-height: 56px;
+    background: #f8faff;
+    border: 2px dashed #bfdbfe;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start;
+  }
+  .selected-symptoms-box.has-items { border-style: solid; border-color: #93c5fd; background: #eff6ff; }
+  .selected-chip {
+    background: #2563eb; color: white;
+    padding: 4px 10px 4px 12px;
+    border-radius: 20px; font-size: 0.8rem;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .selected-chip button { background:none;border:none;color:rgba(255,255,255,0.7);padding:0;line-height:1;cursor:pointer;font-size:1rem; }
+  .selected-chip button:hover { color:white; }
+  .body-system-tabs { border-bottom: 2px solid #e2e8f0; margin-bottom: 16px; }
+  .body-system-tabs .nav-link { color: #64748b; border: none; padding: 8px 16px; font-size: 0.85rem; font-weight: 500; }
+  .body-system-tabs .nav-link.active { color: #2563eb; border-bottom: 2px solid #2563eb; margin-bottom: -2px; background: none; }
+  .counter-badge {
+    background: #2563eb; color: white;
+    border-radius: 20px; padding: 2px 10px;
+    font-size: 0.8rem; font-weight: 600;
+    display: inline-block; min-width: 28px; text-align: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+  <div class="row g-4">
+
+    <!-- LEFT: Symptom Selector -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header bg-white py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-list-check me-2 text-primary"></i>Select Your Symptoms</h5>
+            <span class="counter-badge" id="count-badge">0 selected</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Search -->
+          <div class="symptom-search-box mb-3">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" id="symptomSearch" class="form-control form-control-lg"
+                   placeholder="Search symptoms... (e.g. headache, fever, cough)">
+          </div>
+
+          <!-- Body System Tabs -->
+          <ul class="nav body-system-tabs" id="bodyTabs">
+            <li class="nav-item"><a class="nav-link active" href="#" data-filter="all">All</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-filter="head">Head & Brain</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-filter="chest">Chest</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-filter="stomach">Stomach</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-filter="skin">Skin</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-filter="general">General</a></li>
+          </ul>
+
+          <!-- Symptoms Grid -->
+          <div class="symptoms-grid" id="symptomsGrid">
+            {% for symptom in symptoms %}
+            <div class="symptom-chip"
+                 data-name="{{ symptom.name }}"
+                 data-display="{{ symptom.name|cut:'_'|title }}"
+                 onclick="toggleSymptom(this)">
+              {{ symptom.name|cut:"_"|capfirst }}
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="mt-2 text-muted" style="font-size:0.8rem;">
+            <i class="bi bi-info-circle me-1"></i>
+            Click symptoms to select. Select at least 2 for a reliable prediction.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Prediction Form -->
+    <div class="col-lg-4">
+      <form method="post" id="predictionForm">
+        {% csrf_token %}
+        <div id="symptomInputs"></div><!-- Hidden inputs injected by JS -->
+
+        <!-- Selected Symptoms Box -->
+        <div class="card mb-3">
+          <div class="card-header bg-white py-3">
+            <h6 class="mb-0 fw-bold"><i class="bi bi-check2-all me-2 text-success"></i>Selected Symptoms</h6>
+          </div>
+          <div class="card-body p-3">
+            <div class="selected-symptoms-box" id="selectedBox">
+              <span class="text-muted" id="emptyMsg" style="font-size:0.85rem;">
+                <i class="bi bi-cursor me-1"></i>Click symptoms on the left to add them here...
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Patient Info -->
+        <div class="card mb-3">
+          <div class="card-header bg-white py-3">
+            <h6 class="mb-0 fw-bold"><i class="bi bi-person me-2 text-primary"></i>Patient Details</h6>
+          </div>
+          <div class="card-body p-3">
+            <div class="mb-3">
+              <label class="form-label fw-500">Age</label>
+              <input type="number" name="age" class="form-control"
+                     value="{{ user.get_age|default:25 }}" min="1" max="120" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-500">Additional Notes</label>
+              <textarea name="notes" class="form-control" rows="3"
+                        placeholder="Any other info (e.g. duration, severity)..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" id="submitBtn" disabled>
+          <i class="bi bi-cpu me-2"></i>Predict Disease
+        </button>
+        <p class="text-center text-muted mt-2" style="font-size:0.78rem;">
+          <i class="bi bi-shield-check me-1"></i>
+          AI prediction only. Always consult a real doctor.
+        </p>
+      </form>
+
+      <!-- Accuracy Info Card -->
+      <div class="card mt-3">
+        <div class="card-body p-3">
+          <h6 class="fw-bold mb-3"><i class="bi bi-bar-chart-line me-2 text-primary"></i>ML Models Used</h6>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between mb-1"><small>Random Forest</small><small class="fw-bold">~95%</small></div>
+            <div class="progress" style="height:5px;"><div class="progress-bar bg-primary" style="width:95%"></div></div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between mb-1"><small>Decision Tree</small><small class="fw-bold">~90%</small></div>
+            <div class="progress" style="height:5px;"><div class="progress-bar bg-success" style="width:90%"></div></div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between mb-1"><small>Naive Bayes</small><small class="fw-bold">~85%</small></div>
+            <div class="progress" style="height:5px;"><div class="progress-bar bg-warning" style="width:85%"></div></div>
+          </div>
+          <div class="mb-0">
+            <div class="d-flex justify-content-between mb-1"><small>SVM</small><small class="fw-bold">~88%</small></div>
+            <div class="progress" style="height:5px;"><div class="progress-bar bg-info" style="width:88%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const selectedSymptoms = new Set();
+
+// Body system keyword map for tab filtering
+const systemMap = {
+  head: ['headache','dizziness','migraine','nausea','vision','eye','neck','stiff_neck','blurred','confusion','slurred','memory','spinning','loss_of_balance','altered_sensorium'],
+  chest: ['chest_pain','breathlessness','cough','palpitations','fast_heart_rate','phlegm','blood_in_sputum','rusty_sputum','mucoid_sputum'],
+  stomach: ['stomach','abdominal','vomiting','diarrhoea','constipation','acidity','indigestion','nausea','loss_of_appetite','bloating','passage_of_gases','belly_pain','distention'],
+  skin: ['skin_rash','itching','nodal','dischromic','pus_filled','blackheads','scurring','silver','peeling','inflammatory_nails','blister','yellow_crust','red_sore'],
+  general: ['fatigue','fever','chills','sweating','weight','anxiety','restlessness','lethargy','malaise','mood','depression','irritability','muscle']
+};
+
+let activeFilter = 'all';
+
+function toggleSymptom(chip) {
+  const name = chip.dataset.name;
+  if (selectedSymptoms.has(name)) {
+    selectedSymptoms.delete(name);
+    chip.classList.remove('selected');
+  } else {
+    selectedSymptoms.add(name);
+    chip.classList.add('selected');
+  }
+  updateSelectedBox();
+}
+
+function removeSymptom(name) {
+  selectedSymptoms.delete(name);
+  document.querySelectorAll(`.symptom-chip[data-name="${name}"]`).forEach(c => c.classList.remove('selected'));
+  updateSelectedBox();
+}
+
+function updateSelectedBox() {
+  const box = document.getElementById('selectedBox');
+  const emptyMsg = document.getElementById('emptyMsg');
+  const inputs = document.getElementById('symptomInputs');
+  const badge = document.getElementById('count-badge');
+  const btn = document.getElementById('submitBtn');
+
+  box.innerHTML = '';
+  inputs.innerHTML = '';
+
+  if (selectedSymptoms.size === 0) {
+    box.appendChild(Object.assign(document.createElement('span'), {
+      className: 'text-muted',
+      id: 'emptyMsg',
+      style: 'font-size:0.85rem;',
+      innerHTML: '<i class="bi bi-cursor me-1"></i>Click symptoms on the left to add them here...'
+    }));
+    box.classList.remove('has-items');
+  } else {
+    box.classList.add('has-items');
+    selectedSymptoms.forEach(name => {
+      const display = name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const chip = document.createElement('div');
+      chip.className = 'selected-chip';
+      chip.innerHTML = `${display} <button type="button" onclick="removeSymptom('${name}')">&times;</button>`;
+      box.appendChild(chip);
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'symptoms';
+      input.value = name;
+      inputs.appendChild(input);
+    });
+  }
+
+  badge.textContent = `${selectedSymptoms.size} selected`;
+  btn.disabled = selectedSymptoms.size < 2;
+}
+
+// Search filter
+document.getElementById('symptomSearch').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.symptom-chip').forEach(chip => {
+    const matches = chip.dataset.name.includes(q.replace(/ /g,'_'));
+    chip.style.display = (matches || q === '') ? 'inline-flex' : 'none';
+  });
+});
+
+// Tab filter
+document.querySelectorAll('[data-filter]').forEach(tab => {
+  tab.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelectorAll('[data-filter]').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    activeFilter = this.dataset.filter;
+
+    document.querySelectorAll('.symptom-chip').forEach(chip => {
+      if (activeFilter === 'all') {
+        chip.style.display = 'inline-flex';
+      } else {
+        const keywords = systemMap[activeFilter] || [];
+        const matches = keywords.some(k => chip.dataset.name.includes(k));
+        chip.style.display = matches ? 'inline-flex' : 'none';
+      }
+    });
+  });
+});
+
+// Loading state on submit
+document.getElementById('predictionForm').addEventListener('submit', function() {
+  const btn = document.getElementById('submitBtn');
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Analyzing Symptoms...';
+  btn.disabled = true;
+});
+</script>
+{% endblock %} 

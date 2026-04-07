@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page Not Found | HealthPredict AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:       #0a2342;
+      --navy-mid:   #113568;
+      --navy-light: #1a4a8a;
+      --teal:       #0891b2;
+      --teal-mid:   #0e7490;
+      --teal-light: #22d3ee;
+      --teal-pale:  #e0f7fa;
+      --mint:       #10b981;
+      --mint-pale:  #ecfdf5;
+      --red:        #dc2626;
+      --bg:         #f0f4f8;
+      --white:      #ffffff;
+      --border:     #e2e8f0;
+      --t1:         #0f172a;
+      --t2:         #475569;
+      --tm:         #94a3b8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── BACKGROUND LAYERS ── */
+    /* Subtle dot matrix */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(8,145,178,0.07) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Radial color wash */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 10% 20%, rgba(8,145,178,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 55% 50% at 90% 80%, rgba(10,35,66,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse 45% 45% at 50% 50%, rgba(16,185,129,0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── ANIMATED CROSS / PLUS SHAPES (medical) ── */
+    .med-cross {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.06;
+    }
+    .med-cross::before,
+    .med-cross::after {
+      content: '';
+      position: absolute;
+      background: var(--navy);
+      border-radius: 3px;
+    }
+    .med-cross::before { width: 12px; height: 36px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+    .med-cross::after  { width: 36px; height: 12px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+    .mc1 { top: 8%;  left: 6%;  animation: mcFloat 9s ease-in-out infinite; }
+    .mc2 { top: 15%; right: 8%; animation: mcFloat 11s ease-in-out infinite reverse; scale: 1.4; }
+    .mc3 { bottom: 12%; left: 10%; animation: mcFloat 8s ease-in-out infinite 2s; scale: 0.8; }
+    .mc4 { bottom: 18%; right: 5%; animation: mcFloat 10s ease-in-out infinite 1s; scale: 1.6; }
+    .mc5 { top: 48%; left: 2%;  animation: mcFloat 13s ease-in-out infinite 3s; scale: 0.6; }
+    .mc6 { top: 60%; right: 2%; animation: mcFloat 7s ease-in-out infinite 4s; scale: 1.2; }
+    @keyframes mcFloat {
+      0%,100% { transform: translateY(0) rotate(0deg); }
+      33%      { transform: translateY(-14px) rotate(8deg); }
+      66%      { transform: translateY(8px) rotate(-5deg); }
+    }
+
+    /* ── FLOATING PARTICLES ── */
+    .particle {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: pFloat 14s ease-in-out infinite;
+    }
+    @keyframes pFloat {
+      0%,100% { transform: translate(0,0) scale(1); opacity: var(--op); }
+      33%      { transform: translate(20px,-30px) scale(1.1); }
+      66%      { transform: translate(-15px, 20px) scale(0.9); opacity: calc(var(--op) * 0.6); }
+    }
+    .p1  { width:180px;height:180px;background:var(--teal); opacity:.06; top:-40px; left:-40px; --op:.06; filter:blur(50px); animation-delay:0s; }
+    .p2  { width:140px;height:140px;background:var(--mint); opacity:.05; bottom:-20px; right:-20px; --op:.05; filter:blur(40px); animation-delay:-5s; }
+    .p3  { width: 90px;height: 90px;background:var(--navy); opacity:.05; top:40%; right:8%; --op:.05; filter:blur(30px); animation-delay:-9s; }
+
+    /* ── MAIN CARD ── */
+    .error-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 56px 52px 48px;
+      max-width: 540px;
+      width: 90%;
+      position: relative;
+      z-index: 2;
+      box-shadow:
+        0 2px 4px rgba(10,35,66,0.04),
+        0 8px 24px rgba(10,35,66,0.08),
+        0 32px 80px rgba(10,35,66,0.12);
+      animation: cardIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+      overflow: hidden;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(32px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Top accent bar */
+    .error-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--navy), var(--teal), var(--mint), var(--teal));
+      background-size: 300% 100%;
+      animation: barShift 4s ease-in-out infinite;
+    }
+    @keyframes barShift {
+      0%,100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
+
+    /* Corner watermark */
+    .error-card::after {
+      content: 'ERR_404';
+      position: absolute;
+      bottom: 16px;
+      right: 20px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--border);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* ── BRAND ── */
+    .card-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 36px;
+      animation: fadeUp 0.5s 0.15s ease both;
+    }
+    .brand-mark {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--navy), var(--teal-mid));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(8,145,178,0.25);
+    }
+    .brand-mark i { color: #fff; font-size: 1rem; }
+    .brand-label {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1rem;
+      color: var(--navy);
+    }
+    .brand-label span { color: var(--teal); }
+
+    /* ── 404 GIANT NUMBER ── */
+    .num-404 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 8px;
+      animation: fadeUp 0.6s 0.2s ease both;
+      position: relative;
+    }
+    .digit {
+      font-family: 'DM Serif Display', serif;
+      font-size: 7rem;
+      line-height: 1;
+      color: var(--navy);
+      letter-spacing: -4px;
+      display: inline-block;
+      animation: digitBob 4s ease-in-out infinite;
+    }
+    .digit:nth-child(1) { animation-delay: 0s; }
+    .digit:nth-child(2) { animation-delay: 0.15s; }
+    .digit:nth-child(3) { animation-delay: 0.30s; }
+    @keyframes digitBob {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-6px); }
+    }
+
+    /* The 0 in the middle is a medical cross / pulse */
+    .digit-mid {
+      color: var(--teal);
+      position: relative;
+    }
+    .digit-mid::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 10%;
+      width: 80%; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--teal), transparent);
+      border-radius: 2px;
+      animation: underlineGlow 2s ease-in-out infinite;
+    }
+    @keyframes underlineGlow {
+      0%,100% { opacity: 0.5; transform: scaleX(0.7); }
+      50%      { opacity: 1; transform: scaleX(1); }
+    }
+
+    /* ── PULSE LINE (EKG style) ── */
+    .pulse-wrap {
+      width: 100%;
+      height: 40px;
+      margin: 4px 0 24px;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+    .pulse-svg { width: 100%; height: 100%; overflow: visible; }
+    .pulse-path {
+      fill: none;
+      stroke: var(--teal);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.5;
+      stroke-dasharray: 400;
+      stroke-dashoffset: 400;
+      animation: drawLine 1.6s 0.5s ease forwards, pulseFade 3s 2.1s ease-in-out infinite;
+    }
+    @keyframes drawLine {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes pulseFade {
+      0%,100% { opacity: 0.4; }
+      50%      { opacity: 0.9; }
+    }
+
+    /* ── TEXT ── */
+    .error-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--navy);
+      margin-bottom: 10px;
+      animation: fadeUp 0.6s 0.35s ease both;
+    }
+    .error-sub {
+      font-size: 0.9rem;
+      color: var(--t2);
+      line-height: 1.75;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s 0.42s ease both;
+      max-width: 380px;
+    }
+
+    /* ── STATUS CHIP ── */
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #fef2f2;
+      border: 1px solid rgba(220,38,38,0.2);
+      color: var(--red);
+      padding: 5px 14px;
+      border-radius: 30px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+      animation: fadeUp 0.5s 0.18s ease both;
+    }
+    .chip-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--red);
+      animation: chipBlink 1.5s ease-in-out infinite;
+    }
+    @keyframes chipBlink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    /* ── ACTIONS ── */
+    .error-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.5s ease both;
+    }
+    .btn-home {
+      background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+      border: none;
+      color: #fff;
+      padding: 11px 24px;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.22s ease;
+      box-shadow: 0 4px 14px rgba(10,35,66,0.22);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-home::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.4s ease;
+    }
+    .btn-home:hover::before { transform: translateX(100%); }
+    .btn-home:hover {
+      background: linear-gradient(135deg, var(--navy-mid), var(--teal-mid));
+      box-shadow: 0 6px 20px rgba(8,145,178,0.3);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .btn-back {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--t2);
+      padding: 11px 22px;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-back:hover {
+      border-color: var(--teal);
+      color: var(--teal-mid);
+      background: var(--teal-pale);
+      transform: translateY(-1px);
+    }
+
+    /* ── QUICK LINKS ── */
+    .quick-links {
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.6s 0.58s ease both;
+    }
+    .ql-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--tm);
+      margin-bottom: 12px;
+    }
+    .ql-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .ql-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      color: var(--t2);
+    }
+    .ql-item:hover {
+      border-color: var(--teal);
+      background: var(--teal-pale);
+      color: var(--teal-mid);
+      transform: translateX(3px);
+    }
+    .ql-icon {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .ql-text { font-size: 0.8rem; font-weight: 500; }
+
+    /* ── FOOTER NOTE ── */
+    .card-foot {
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: fadeUp 0.6s 0.65s ease both;
+    }
+    .foot-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--mint);
+      box-shadow: 0 0 6px var(--mint);
+      flex-shrink: 0;
+      animation: chipBlink 2s ease-in-out infinite;
+    }
+    .foot-text {
+      font-size: 0.72rem;
+      color: var(--tm);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Ambient particles -->
+<div class="particle p1"></div>
+<div class="particle p2"></div>
+<div class="particle p3"></div>
+
+<!-- Medical cross watermarks -->
+<div class="med-cross mc1"></div>
+<div class="med-cross mc2"></div>
+<div class="med-cross mc3"></div>
+<div class="med-cross mc4"></div>
+<div class="med-cross mc5"></div>
+<div class="med-cross mc6"></div>
+
+<!-- ── MAIN CARD ── -->
+<div class="error-card">
+
+  <!-- Brand -->
+  <div class="card-brand">
+    <div class="brand-mark">
+      <i class="bi bi-heart-pulse-fill"></i>
+    </div>
+    <div class="brand-label">Health<span>Predict</span> AI</div>
+  </div>
+
+  <!-- Status chip -->
+  <div class="status-chip">
+    <span class="chip-dot"></span>
+    HTTP 404 · RESOURCE NOT FOUND
+  </div>
+
+  <!-- 404 digits -->
+  <div class="num-404">
+    <span class="digit">4</span>
+    <span class="digit digit-mid">0</span>
+    <span class="digit">4</span>
+  </div>
+
+  <!-- EKG pulse line -->
+  <div class="pulse-wrap">
+    <svg class="pulse-svg" viewBox="0 0 480 40" preserveAspectRatio="none">
+      <path class="pulse-path"
+        d="M0,20 L60,20 L75,20 L82,4 L90,36 L98,4 L106,36 L114,20 L130,20
+           L145,20 L152,4 L160,36 L168,4 L176,36 L184,20 L200,20
+           L215,20 L222,8 L228,32 L234,20 L250,20
+           L280,20 L420,20 L480,20"/>
+    </svg>
+  </div>
+
+  <!-- Text -->
+  <h1 class="error-title">Page Not Found</h1>
+  <p class="error-sub">
+    The clinical record you're looking for doesn't exist, has been moved,
+    or is temporarily unavailable. Please check the URL or navigate back to the dashboard.
+  </p>
+
+  <!-- Actions -->
+  <div class="error-actions">
+    <a href="/" class="btn-home">
+      <i class="bi bi-house-fill"></i> Go to Dashboard
+    </a>
+    <a onclick="history.back()" class="btn-back">
+      <i class="bi bi-arrow-left"></i> Go Back
+    </a>
+  </div>
+
+  <!-- Quick links -->
+  <div class="quick-links">
+    <div class="ql-label">Quick Navigation</div>
+    <div class="ql-grid">
+      <a href="{% url 'predict_disease' %}" class="ql-item">
+        <div class="ql-icon" style="background:var(--teal-pale);color:var(--teal-mid);">
+          <i class="bi bi-cpu"></i>
+        </div>
+        <span class="ql-text">Disease Prediction</span>
+      </a>
+      <a href="{% url 'prediction_history' %}" class="ql-item">
+        <div class="ql-icon" style="background:#eff6ff;color:var(--navy-light);">
+          <i class="bi bi-clock-history"></i>
+        </div>
+        <span class="ql-text">Prediction History</span>
+      </a>
+      <a href="{% url 'doctor_list' %}" class="ql-item">
+        <div class="ql-icon" style="background:var(--mint-pale);color:#059669;">
+          <i class="bi bi-people"></i>
+        </div>
+        <span class="ql-text">Find Doctors</span>
+      </a>
+      <a href="{% url 'profile' %}" class="ql-item">
+        <div class="ql-icon" style="background:#fef2f2;color:var(--red);">
+          <i class="bi bi-person-circle"></i>
+        </div>
+        <span class="ql-text">My Profile</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="card-foot">
+    <span class="foot-dot"></span>
+    <span class="foot-text">
+      HealthPredict AI · AI Engine Operational · If this persists, contact your administrator.
+    </span>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  /* 3D tilt on the card */
+  const card = document.querySelector('.error-card');
+  document.addEventListener('mousemove', e => {
+    const cx = window.innerWidth  / 2;
+    const cy = window.innerHeight / 2;
+    const dx = (e.clientX - cx) / cx;
+    const dy = (e.clientY - cy) / cy;
+    card.style.transform =
+      `perspective(900px) rotateY(${dx * 6}deg) rotateX(${-dy * 5}deg) translateY(0) scale(1.005)`;
+  });
+  document.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+</script>
+</body>
+</html>

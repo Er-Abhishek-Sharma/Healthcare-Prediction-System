@@ -1,0 +1,406 @@
+{% extends 'base/base.html' %}
+{% block content %}
+
+{% block extra_css %}
+<style>
+  /* ── WELCOME BANNER ── */
+  .welcome-banner {
+    background: linear-gradient(135deg, var(--navy,#0a2342) 0%, #113568 60%, #0e7490 100%);
+    border-radius: 16px;
+    padding: 28px 32px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(10,35,66,.2);
+  }
+  .welcome-banner::before {
+    content: '';
+    position: absolute;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%);
+    right: -40px; top: -60px;
+    pointer-events: none;
+  }
+  .welcome-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    border-radius: 16px;
+  }
+  .welcome-banner-inner { position: relative; z-index: 1; }
+  .banner-title { font-family: 'DM Serif Display', serif; font-size: 1.5rem; font-weight: 400; color: #fff; margin-bottom: 4px; }
+  .banner-sub { font-size: .85rem; color: rgba(255,255,255,.55); margin-bottom: 18px; font-weight: 300; }
+  .banner-ekg { width: 100%; height: 32px; opacity: .4; margin-bottom: 16px; }
+  .banner-ekg-path {
+    fill: none; stroke: #22d3ee; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 400; stroke-dashoffset: 400;
+    animation: ekgDraw 1.8s .3s ease forwards, ekgFade 3s 2.1s ease-in-out infinite;
+  }
+  @keyframes ekgDraw { to { stroke-dashoffset: 0; } }
+  @keyframes ekgFade { 0%,100%{opacity:.4} 50%{opacity:.85} }
+  .btn-banner {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.25);
+    color: #fff;
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    transition: all .22s;
+    backdrop-filter: blur(8px);
+  }
+  .btn-banner:hover { background: rgba(255,255,255,.25); color: #fff; transform: translateY(-1px); }
+  .banner-icon-bg {
+    position: absolute; right: 32px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 7rem;
+    color: rgba(255,255,255,.06);
+    line-height: 1;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── CHARTS ── */
+  .chart-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(10,35,66,.06); }
+  .chart-header { padding: 14px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
+  .chart-title { font-family: 'DM Serif Display', serif; font-size: 1rem; color: #0a2342; display: flex; align-items: center; gap: 8px; }
+  .chart-title i { color: #0891b2; }
+
+  /* ── HEALTH PROFILE LIST ── */
+  .profile-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: .86rem; }
+  .profile-row:last-child { border-bottom: none; }
+  .profile-row-label { color: #94a3b8; display: flex; align-items: center; gap: 7px; }
+  .profile-row-label i { color: #0891b2; }
+  .profile-row-val { font-weight: 600; color: #0f172a; }
+  .profile-row-val.empty { color: #cbd5e1; font-weight: 400; font-style: italic; }
+
+  /* ── BMI BADGE ── */
+  .bmi-badge { font-size: .65rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-left: 6px; }
+  .bmi-normal  { background: #ecfdf5; color: #059669; }
+  .bmi-under   { background: #fffbeb; color: #d97706; }
+  .bmi-over    { background: #fffbeb; color: #d97706; }
+  .bmi-obese   { background: #fef2f2; color: #dc2626; }
+
+  /* ── CONFIDENCE BAR ── */
+  .conf-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .conf-bar { height: 5px; width: 70px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+  .conf-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #0a2342, #0891b2); }
+
+  /* ── QUICK ACTION BUTTONS ── */
+  .qa-btn { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: .86rem; font-weight: 500; color: #475569; text-decoration: none; transition: all .2s; margin-bottom: 8px; }
+  .qa-btn:last-child { margin-bottom: 0; }
+  .qa-btn-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
+  .qa-btn:hover { border-color: #0891b2; background: #e0f7fa; color: #0e7490; transform: translateX(3px); }
+  .qa-btn:hover .qa-btn-icon { background: #0891b2; color: #fff; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state { text-align: center; padding: 40px 20px; color: #94a3b8; }
+  .empty-state i { font-size: 3rem; opacity: .2; display: block; margin-bottom: 12px; }
+  .empty-state p { font-size: .88rem; margin-bottom: 14px; }
+</style>
+{% endblock %}
+
+<div class="fade-in">
+
+  <!-- ── WELCOME BANNER ── -->
+  <div class="welcome-banner">
+    <i class="bi bi-heart-pulse banner-icon-bg"></i>
+    <div class="welcome-banner-inner">
+      <div class="banner-title">Welcome back, {{ user.get_full_name|default:user.username }}</div>
+      <div class="banner-sub">Here's your health overview for today. Stay consistent and track your symptoms regularly.</div>
+      <svg class="banner-ekg" viewBox="0 0 460 32" preserveAspectRatio="none">
+        <path class="banner-ekg-path" d="M0,16 L60,16 L72,16 L80,3 L88,29 L96,3 L104,29 L112,16 L130,16 L145,16 L152,6 L160,26 L168,6 L176,26 L184,16 L200,16 L212,16 L218,8 L224,24 L230,16 L260,16 L460,16"/>
+      </svg>
+      <a href="{% url 'predict_disease' %}" class="btn-banner">
+        <i class="bi bi-cpu"></i> Run New Prediction
+      </a>
+    </div>
+  </div>
+
+  <!-- ── STAT CARDS ── -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-teal">
+        <div class="stat-card-content">
+          <div class="stat-icon"><i class="bi bi-cpu"></i></div>
+          <div class="stat-number">{{ total_predictions }}</div>
+          <div class="stat-label">Total Predictions</div>
+          <div class="stat-delta">↑ This month</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-mint">
+        <div class="stat-card-content">
+          <div class="stat-icon"><i class="bi bi-activity"></i></div>
+          <div class="stat-number">{{ bmi|default:"--" }}</div>
+          <div class="stat-label">Your BMI</div>
+          <div class="stat-delta">{% if bmi_category %}{{ bmi_category }}{% else %}Complete profile{% endif %}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-amber">
+        <div class="stat-card-content">
+          <div class="stat-icon"><i class="bi bi-droplet-half"></i></div>
+          <div class="stat-number">{{ profile.blood_group|default:"--" }}</div>
+          <div class="stat-label">Blood Group</div>
+          <div class="stat-delta">On record</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-red">
+        <div class="stat-card-content">
+          <div class="stat-icon"><i class="bi bi-calendar-heart"></i></div>
+          <div class="stat-number">{{ user.get_age|default:"--" }}</div>
+          <div class="stat-label">Age (Years)</div>
+          <div class="stat-delta">Date of birth</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CHARTS ROW ── -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-8">
+      <div class="chart-card h-100">
+        <div class="chart-header">
+          <div class="chart-title"><i class="bi bi-graph-up"></i> Monthly Prediction Activity</div>
+          <span class="badge-clinical">{{ total_predictions }} total</span>
+        </div>
+        <div class="card-body p-3">
+          <canvas id="monthlyChart" height="100"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="chart-card h-100">
+        <div class="chart-header">
+          <div class="chart-title"><i class="bi bi-pie-chart"></i> Disease Frequency</div>
+        </div>
+        <div class="card-body p-3 d-flex align-items-center justify-content-center">
+          {% if disease_counts != "[]" %}
+          <canvas id="diseaseChart"></canvas>
+          {% else %}
+          <div class="empty-state">
+            <i class="bi bi-bar-chart"></i>
+            <p>No predictions yet.<br>Run your first prediction!</p>
+            <a href="{% url 'predict_disease' %}" class="btn btn-primary btn-sm">Start Now →</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BOTTOM ROW ── -->
+  <div class="row g-4">
+
+    <!-- Recent Predictions Table -->
+    <div class="col-md-7">
+      <div class="card no-tilt">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <span style="display:flex;align-items:center;gap:8px;font-family:'DM Serif Display',serif;font-size:1rem;color:#0a2342;">
+            <i class="bi bi-clock-history" style="color:#0891b2;"></i> Recent Predictions
+          </span>
+          <a href="{% url 'prediction_history' %}" class="btn btn-outline-secondary btn-sm" style="font-size:.78rem;">View All</a>
+        </div>
+        <div class="card-body p-0">
+          {% if recent_predictions %}
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Disease</th>
+                  <th>Confidence</th>
+                  <th>Date</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for pred in recent_predictions %}
+                <tr>
+                  <td>
+                    <div style="font-weight:600;font-size:.88rem;color:#0f172a;">{{ pred.predicted_disease_name }}</div>
+                    <div style="font-size:.72rem;color:#94a3b8;">{{ pred.model_used }}</div>
+                  </td>
+                  <td>
+                    <div class="conf-bar-wrap">
+                      <div class="conf-bar">
+                        <div class="conf-bar-fill" style="width:{{ pred.confidence_score|floatformat:0 }}0%;"></div>
+                      </div>
+                      <span style="font-size:.78rem;font-weight:600;color:#0a2342;">{{ pred.get_confidence_percentage }}</span>
+                    </div>
+                  </td>
+                  <td><span style="font-size:.78rem;color:#94a3b8;">{{ pred.created_at|date:"M d, Y" }}</span></td>
+                  <td>
+                    <a href="{% url 'prediction_result' pred.id %}" class="badge-clinical" style="text-decoration:none;font-size:.72rem;">View →</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <p>No predictions yet.<br><a href="{% url 'predict_disease' %}" style="color:#0891b2;">Make your first prediction →</a></p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Health Profile + Quick Actions -->
+    <div class="col-md-5">
+
+      <!-- Health Profile -->
+      <div class="card no-tilt mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <span style="display:flex;align-items:center;gap:8px;font-family:'DM Serif Display',serif;font-size:1rem;color:#0a2342;">
+            <i class="bi bi-person-lines-fill" style="color:#0891b2;"></i> Health Profile
+          </span>
+          <a href="{% url 'update_patient_profile' %}" class="btn btn-outline-secondary btn-sm" style="font-size:.78rem;">Edit</a>
+        </div>
+        <div class="card-body p-4">
+          <div class="profile-row">
+            <span class="profile-row-label"><i class="bi bi-rulers"></i> Height</span>
+            <span class="profile-row-val {% if not profile.height %}empty{% endif %}">
+              {{ profile.height|default:"Not set" }}{% if profile.height %} cm{% endif %}
+            </span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-row-label"><i class="bi bi-speedometer2"></i> Weight</span>
+            <span class="profile-row-val {% if not profile.weight %}empty{% endif %}">
+              {{ profile.weight|default:"Not set" }}{% if profile.weight %} kg{% endif %}
+            </span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-row-label"><i class="bi bi-activity"></i> BMI</span>
+            <span class="profile-row-val">
+              {{ bmi|default:"N/A" }}
+              {% if bmi %}
+              <span class="bmi-badge {% if bmi < 18.5 %}bmi-under{% elif bmi < 25 %}bmi-normal{% elif bmi < 30 %}bmi-over{% else %}bmi-obese{% endif %}">{{ bmi_category }}</span>
+              {% endif %}
+            </span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-row-label"><i class="bi bi-droplet"></i> Blood Group</span>
+            <span class="profile-row-val {% if not profile.blood_group %}empty{% endif %}">{{ profile.blood_group|default:"Not set" }}</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-row-label"><i class="bi bi-heart"></i> Allergies</span>
+            <span class="profile-row-val {% if not profile.allergies %}empty{% endif %}">{{ profile.allergies|default:"None recorded"|truncatechars:22 }}</span>
+          </div>
+          {% if not profile.height %}
+          <div class="alert alert-warning mt-3 mb-0 py-2" style="font-size:.8rem;border-radius:8px;">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            Complete your health profile for better predictions.
+            <a href="{% url 'update_patient_profile' %}" style="color:inherit;font-weight:600;">Update now →</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card no-tilt">
+        <div class="card-header">
+          <span style="display:flex;align-items:center;gap:8px;font-family:'DM Serif Display',serif;font-size:1rem;color:#0a2342;">
+            <i class="bi bi-lightning" style="color:#d97706;"></i> Quick Actions
+          </span>
+        </div>
+        <div class="card-body p-3">
+          <a href="{% url 'predict_disease' %}" class="qa-btn">
+            <div class="qa-btn-icon" style="background:#eff6ff;color:#1a4a8a;"><i class="bi bi-cpu"></i></div>
+            New Disease Prediction
+          </a>
+          <a href="{% url 'doctor_list' %}" class="qa-btn">
+            <div class="qa-btn-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-people"></i></div>
+            Find a Specialist
+          </a>
+          <a href="{% url 'prediction_history' %}" class="qa-btn">
+            <div class="qa-btn-icon" style="background:#e0f7fa;color:#0e7490;"><i class="bi bi-clock-history"></i></div>
+            View Full History
+          </a>
+          <a href="{% url 'medical_history' %}" class="qa-btn">
+            <div class="qa-btn-icon" style="background:#fff7ed;color:#c2410c;"><i class="bi bi-journal-medical"></i></div>
+            Medical Records
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Monthly trend */
+const mCtx = document.getElementById('monthlyChart').getContext('2d');
+new Chart(mCtx, {
+  type: 'line',
+  data: {
+    labels: {{ months_labels|safe }},
+    datasets: [{
+      label: 'Predictions',
+      data: {{ months_data|safe }},
+      borderColor: '#0891b2',
+      backgroundColor: 'rgba(8,145,178,0.07)',
+      borderWidth: 2.5,
+      pointBackgroundColor: '#0a2342',
+      pointBorderColor: '#0891b2',
+      pointBorderWidth: 2,
+      pointRadius: 5,
+      tension: 0.4,
+      fill: true
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, ticks: { stepSize: 1, color: '#94a3b8', font: { size: 11 } }, grid: { color: 'rgba(10,35,66,0.04)' } },
+      x: { ticks: { color: '#94a3b8', font: { size: 11 } }, grid: { display: false } }
+    }
+  }
+});
+
+/* Disease doughnut */
+{% if disease_counts != "[]" %}
+const dCtx = document.getElementById('diseaseChart').getContext('2d');
+new Chart(dCtx, {
+  type: 'doughnut',
+  data: {
+    labels: {{ disease_labels|safe }},
+    datasets: [{
+      data: {{ disease_counts|safe }},
+      backgroundColor: ['#0a2342','#0891b2','#10b981','#d97706','#dc2626'],
+      borderWidth: 0,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    cutout: '68%',
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 14, font: { size: 10 }, color: '#475569' } }
+    }
+  }
+});
+{% endif %}
+</script>
+{% endblock %}

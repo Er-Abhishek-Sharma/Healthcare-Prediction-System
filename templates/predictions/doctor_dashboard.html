@@ -1,0 +1,99 @@
+
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="fade-in">
+
+  <div class="page-header-strip mb-4">
+    <div>
+      <div class="page-header-title"><i class="bi bi-clipboard2-pulse me-2" style="color:#0891b2;font-size:1.1rem;"></i>Doctor Dashboard</div>
+      <div class="page-header-sub">Monitor patient predictions and clinical activity</div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="stat-card stat-navy">
+        <div class="stat-card-content">
+          <div class="stat-icon"><i class="bi bi-people"></i></div>
+          <div class="stat-number">{{ total_patients }}</div>
+          <div class="stat-label">Total Patients</div>
+          <div class="stat-delta">Active users</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card stat-teal">
+        <div class="stat-card-content">
+          <div class="stat-icon"><i class="bi bi-cpu"></i></div>
+          <div class="stat-number">{{ total_predictions }}</div>
+          <div class="stat-label">Total Predictions</div>
+          <div class="stat-delta">Platform-wide</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card stat-mint">
+        <div class="stat-card-content">
+          <div class="stat-icon"><i class="bi bi-clipboard2-check"></i></div>
+          <div class="stat-number">{{ recent_predictions.count }}</div>
+          <div class="stat-label">Shown Below</div>
+          <div class="stat-delta">Recent activity</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card no-tilt">
+    <div class="card-header" style="font-family:'DM Serif Display',serif;font-size:1.05rem;color:#0a2342;display:flex;align-items:center;gap:8px;">
+      <i class="bi bi-clipboard2-pulse" style="color:#0891b2;"></i> Recent Patient Predictions
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Disease</th>
+              <th>Confidence</th>
+              <th>Model</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pred in recent_predictions %}
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:9px;">
+                  <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0a2342,#0891b2);
+                    display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.72rem;flex-shrink:0;">
+                    {{ pred.patient.first_name.0 }}{{ pred.patient.last_name.0 }}
+                  </div>
+                  <div>
+                    <div style="font-size:.88rem;font-weight:600;color:#0f172a;">{{ pred.patient.get_full_name|default:pred.patient.username }}</div>
+                    <div style="font-size:.72rem;color:#94a3b8;">{{ pred.patient.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td><span style="font-weight:600;font-size:.88rem;">{{ pred.predicted_disease_name }}</span></td>
+              <td>
+                <span style="font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:20px;
+                  background:{% if pred.confidence_score >= 0.8 %}#fef2f2;color:#dc2626{% elif pred.confidence_score >= 0.6 %}#fffbeb;color:#d97706{% else %}#ecfdf5;color:#059669{% endif %};">
+                  {{ pred.get_confidence_percentage }}
+                </span>
+              </td>
+              <td><span class="badge-clinical-navy" style="font-size:.72rem;">{{ pred.model_used }}</span></td>
+              <td><span style="font-size:.78rem;color:#94a3b8;">{{ pred.created_at|date:"M d, Y H:i" }}</span></td>
+              <td><a href="{% url 'prediction_result' pred.id %}" class="btn btn-sm btn-outline-secondary">Review</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="text-align:center;padding:32px;color:#94a3b8;">No predictions to review yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,460 @@
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<style>
+  /* ── SEARCH PANEL ── */
+  .search-panel {
+    background: #fff;
+    border: 1px solid var(--border-soft, #e2e8f0);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(10,35,66,.06);
+    position: relative;
+    overflow: hidden;
+  }
+  .search-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0a2342, #0891b2, #10b981);
+    background-size: 200%;
+    animation: gradBar 4s ease-in-out infinite;
+  }
+  @keyframes gradBar { 0%,100%{background-position:0%} 50%{background-position:100%} }
+
+  /* ── RESULT SUMMARY ── */
+  .result-summary {
+    font-size: .78rem;
+    color: var(--text-muted, #94a3b8);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .result-count {
+    font-weight: 700;
+    color: var(--navy, #0a2342);
+    font-size: .9rem;
+  }
+
+  /* ── DOCTOR CARD ── */
+  .doctor-card {
+    background: #fff;
+    border: 1px solid var(--border-soft, #e2e8f0);
+    border-radius: 18px;
+    overflow: hidden;
+    height: 100%;
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(10,35,66,.06);
+  }
+  /* Colored top border that reveals on hover */
+  .doctor-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0a2342, #0891b2);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+    z-index: 2;
+  }
+  .doctor-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    border-color: rgba(8,145,178,.25);
+    box-shadow: 0 20px 60px rgba(10,35,66,.14), 0 4px 16px rgba(8,145,178,.08);
+  }
+  .doctor-card:hover::before { transform: scaleX(1); }
+
+  /* ── CARD HEADER BAND ── */
+  .dc-header {
+    background: linear-gradient(135deg, #0a2342 0%, #113568 60%, #0e7490 100%);
+    padding: 22px 22px 52px;
+    position: relative;
+    overflow: hidden;
+  }
+  .dc-header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+  }
+  .dc-header-glow {
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(8,145,178,.25) 0%, transparent 70%);
+    right: -40px; top: -60px;
+    pointer-events: none;
+  }
+
+  /* ── AVATAR ── */
+  .doctor-avatar {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+  }
+  .avatar-circle {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,.25), rgba(255,255,255,.1));
+    border: 2px solid rgba(255,255,255,.3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: #fff;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 16px rgba(0,0,0,.2);
+    transition: all 0.3s ease;
+  }
+  .doctor-card:hover .avatar-circle {
+    border-color: rgba(34,211,238,.6);
+    box-shadow: 0 6px 24px rgba(8,145,178,.3);
+    transform: scale(1.05);
+  }
+  /* Availability indicator on avatar */
+  .avail-dot {
+    position: absolute;
+    bottom: 2px; right: 2px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+  .avail-dot.online  { background: #10b981; animation: dotPulse 2s ease-in-out infinite; }
+  .avail-dot.offline { background: #94a3b8; }
+  @keyframes dotPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,.4), 0 2px 6px rgba(0,0,0,.2); }
+    50%      { box-shadow: 0 0 0 5px rgba(16,185,129,0), 0 2px 6px rgba(0,0,0,.2); }
+  }
+
+  .dc-doctor-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    color: #fff;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
+  }
+  .dc-spec-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(8,145,178,.25);
+    border: 1px solid rgba(8,145,178,.35);
+    color: #22d3ee;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: .7rem;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── CARD BODY ── */
+  .dc-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    /* Overlap with header */
+    margin-top: -28px;
+    background: #fff;
+    border-radius: 18px 18px 0 0;
+    z-index: 1;
+  }
+
+  .dc-info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px;
+    font-size: .83rem;
+    color: var(--text-secondary, #475569);
+  }
+  .dc-info-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border-soft, #e2e8f0);
+  }
+  .dc-info-list li:last-child { border-bottom: none; }
+  .dc-info-list i { color: var(--teal, #0891b2); flex-shrink: 0; margin-top: 2px; font-size: .85rem; }
+
+  /* Stars */
+  .star-row { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+  .stars { color: #d97706; font-size: .9rem; letter-spacing: 1px; }
+  .star-count { font-size: .75rem; color: var(--text-muted, #94a3b8); }
+
+  /* Bio */
+  .dc-bio { font-size: .8rem; color: var(--text-muted, #94a3b8); line-height: 1.65; margin-bottom: 14px; flex: 1; }
+
+  /* Availability pill */
+  .avail-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .avail-pill.online  { background: #ecfdf5; color: #059669; border: 1px solid rgba(16,185,129,.2); }
+  .avail-pill.offline { background: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; }
+  .avail-pill i { font-size: .55rem; }
+
+  /* Action buttons */
+  .dc-actions { display: flex; gap: 8px; margin-top: auto; }
+  .dc-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border-radius: 9px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all .22s ease;
+    cursor: pointer;
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .dc-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+    transform: translateX(-100%);
+    transition: transform .4s;
+  }
+  .dc-btn:hover::before { transform: translateX(100%); }
+
+  .dc-btn-contact {
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    color: #475569;
+  }
+  .dc-btn-contact:hover {
+    border-color: #0891b2;
+    color: #0e7490;
+    background: #e0f7fa;
+    transform: translateY(-1px);
+  }
+  .dc-btn-call {
+    background: linear-gradient(135deg, #0a2342, #0e7490);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(10,35,66,.2);
+  }
+  .dc-btn-call:hover {
+    box-shadow: 0 6px 20px rgba(8,145,178,.35);
+    transform: translateY(-1px);
+    color: #fff;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 72px 32px;
+    color: var(--text-muted, #94a3b8);
+  }
+  .empty-icon-wrap {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .empty-icon-wrap i { font-size: 2rem; color: #cbd5e1; }
+  .empty-state h5 { font-family: 'DM Serif Display', serif; color: #0a2342; margin-bottom: 8px; }
+  .empty-state p { font-size: .88rem; margin-bottom: 18px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+
+  <!-- Page header -->
+  <div class="page-header-strip mb-4">
+    <div>
+      <div class="page-header-title">
+        <i class="bi bi-people me-2" style="color:#0891b2;font-size:1.1rem;"></i>Find Doctors
+      </div>
+      <div class="page-header-sub">Browse verified specialists and connect with the right doctor</div>
+    </div>
+  </div>
+
+  <!-- Search panel -->
+  <div class="search-panel">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-6">
+        <label class="form-label">Search Doctors</label>
+        <div style="position:relative;">
+          <i class="bi bi-search" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none;z-index:2;"></i>
+          <input type="text" name="q" value="{{ search }}" class="form-control"
+                 placeholder="Search by name or specialization…"
+                 style="padding-left:38px;">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Specialization</label>
+        <select name="specialization" class="form-select">
+          <option value="">All Specializations</option>
+          {% for spec in specializations %}
+          <option value="{{ spec }}" {% if selected_spec == spec %}selected{% endif %}>{{ spec }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-search me-1"></i>Search
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {% if doctors %}
+  <div class="result-summary">
+    <span class="result-count">{{ doctors|length }}</span>
+    <span>doctor{{ doctors|length|pluralize }} found{% if search %} for "{{ search }}"{% endif %}{% if selected_spec %} · {{ selected_spec }}{% endif %}</span>
+  </div>
+
+  <div class="row g-4">
+    {% for doctor in doctors %}
+    <div class="col-md-6 col-lg-4">
+      <div class="doctor-card">
+
+        <!-- Header band -->
+        <div class="dc-header">
+          <div class="dc-header-glow"></div>
+          <div class="doctor-avatar">
+            <div class="avatar-circle">
+              {{ doctor.user.first_name.0|upper }}{{ doctor.user.last_name.0|upper }}
+            </div>
+            <span class="avail-dot {% if doctor.is_available %}online{% else %}offline{% endif %}"></span>
+          </div>
+          <div class="dc-doctor-name">Dr. {{ doctor.user.get_full_name }}</div>
+          <span class="dc-spec-badge">
+            <i class="bi bi-clipboard2-pulse" style="font-size:.65rem;"></i>
+            {{ doctor.specialization }}
+          </span>
+        </div>
+
+        <!-- Body -->
+        <div class="dc-body">
+
+          <span class="avail-pill {% if doctor.is_available %}online{% else %}offline{% endif %}">
+            <i class="bi bi-circle-fill"></i>
+            {% if doctor.is_available %}Available Now{% else %}Currently Unavailable{% endif %}
+          </span>
+
+          <ul class="dc-info-list">
+            <li>
+              <i class="bi bi-building"></i>
+              <span>{{ doctor.user.hospital_name|default:"Private Practice" }}</span>
+            </li>
+            {% if doctor.available_days %}
+            <li>
+              <i class="bi bi-clock"></i>
+              <span>{{ doctor.available_days }}</span>
+            </li>
+            {% endif %}
+            <li>
+              <i class="bi bi-award"></i>
+              <span>{{ doctor.experience_years }} year{{ doctor.experience_years|pluralize }} experience</span>
+            </li>
+            {% if doctor.user.consultation_fee %}
+            <li>
+              <i class="bi bi-currency-rupee"></i>
+              <span>₹{{ doctor.user.consultation_fee }} per consultation</span>
+            </li>
+            {% endif %}
+          </ul>
+
+          {% if doctor.rating > 0 %}
+          <div class="star-row">
+            <span class="stars">
+              {% for i in "12345" %}{% if forloop.counter <= doctor.rating %}★{% else %}☆{% endif %}{% endfor %}
+            </span>
+            <span class="star-count">{{ doctor.rating }}/5 ({{ doctor.total_reviews }} review{{ doctor.total_reviews|pluralize }})</span>
+          </div>
+          {% endif %}
+
+          {% if doctor.bio %}
+          <div class="dc-bio">{{ doctor.bio|truncatechars:110 }}</div>
+          {% else %}
+          <div class="dc-bio">Experienced specialist available for consultations and second opinions.</div>
+          {% endif %}
+
+          <!-- Actions -->
+          <div class="dc-actions">
+            {% if doctor.user.email %}
+            <a href="mailto:{{ doctor.user.email }}" class="dc-btn dc-btn-contact">
+              <i class="bi bi-envelope"></i>Contact
+            </a>
+            {% endif %}
+            {% if doctor.user.phone %}
+            <a href="tel:{{ doctor.user.phone }}" class="dc-btn dc-btn-call">
+              <i class="bi bi-telephone"></i>Call Now
+            </a>
+            {% endif %}
+            {% if not doctor.user.email and not doctor.user.phone %}
+            <span style="font-size:.78rem;color:#94a3b8;padding:8px 0;">No contact info available</span>
+            {% endif %}
+          </div>
+
+        </div><!-- /.dc-body -->
+      </div><!-- /.doctor-card -->
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon-wrap">
+      <i class="bi bi-people"></i>
+    </div>
+    <h5>No Doctors Found</h5>
+    <p>
+      {% if search %}No results for "{{ search }}". Try a different name or specialization.
+      {% else %}No doctors are listed yet.{% endif %}
+    </p>
+    <a href="{% url 'doctor_list' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Clear Filters
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* 3D tilt on doctor cards */
+document.querySelectorAll('.doctor-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width  - 0.5;
+    const y = (e.clientY - r.top)  / r.height - 0.5;
+    card.style.transform = `translateY(-8px) scale(1.01) perspective(600px) rotateY(${x * 8}deg) rotateX(${-y * 6}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+    card.style.transition = 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+  });
+});
+</script>
+{% endblock %}

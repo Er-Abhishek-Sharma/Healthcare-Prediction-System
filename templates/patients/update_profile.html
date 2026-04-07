@@ -1,0 +1,430 @@
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<style>
+  /* ── SECTION LABELS ── */
+  .section-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--teal, #0891b2);
+    margin-bottom: 14px;
+  }
+  .section-eyebrow::before {
+    content: '';
+    width: 22px; height: 2px;
+    background: var(--teal, #0891b2);
+    display: block;
+    flex-shrink: 0;
+  }
+
+  /* ── SECTION ICON ── */
+  .sec-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  /* ── PROFILE COMPLETENESS INDICATOR ── */
+  .completeness-bar {
+    background: var(--border-soft, #e2e8f0);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .completeness-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #0a2342, #0891b2);
+    transition: width 1s ease;
+    animation: barGrow 1s .5s ease both;
+  }
+  @keyframes barGrow { from { width: 0 !important; } }
+
+  /* ── INFO BANNER (top of card) ── */
+  .info-banner {
+    background: #e0f7fa;
+    border: 1px solid rgba(8,145,178,.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .info-banner i { color: #0891b2; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+  .info-banner-text { font-size: .82rem; color: #0e7490; line-height: 1.6; }
+
+  /* ── CRITICAL NOTICE ── */
+  .critical-notice {
+    background: #fef2f2;
+    border: 1px solid rgba(220,38,38,.15);
+    border-left: 3px solid #dc2626;
+    border-radius: 0 10px 10px 0;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-bottom: 8px;
+  }
+  .critical-notice i { color: #dc2626; font-size: .9rem; flex-shrink: 0; margin-top: 1px; }
+  .critical-notice-text { font-size: .78rem; color: #991b1b; line-height: 1.6; }
+
+  /* ── FORM SECTION DIVIDER ── */
+  .form-section-div {
+    height: 1px;
+    background: var(--border-soft, #e2e8f0);
+    margin: 24px 0;
+    position: relative;
+  }
+  .form-section-div::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 60px; height: 1px;
+    background: var(--teal, #0891b2);
+  }
+
+  /* ── FORM HELP TEXT ── */
+  .form-help { font-size: .73rem; color: #94a3b8; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+  .form-help i { font-size: .7rem; }
+
+  /* ── SAVE BUTTON AREA ── */
+  .save-area {
+    background: #f8fafc;
+    border: 1px solid var(--border-soft, #e2e8f0);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 28px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .save-note { font-size: .75rem; color: #94a3b8; display: flex; align-items: center; gap: 5px; }
+
+  /* ── SIDEBAR STAT CARD (completeness) ── */
+  .profile-stat {
+    background: #fff;
+    border: 1px solid var(--border-soft, #e2e8f0);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 8px rgba(10,35,66,.05);
+    transition: all .28s ease;
+  }
+  .profile-stat:hover { box-shadow: 0 6px 20px rgba(10,35,66,.1); transform: translateY(-2px); }
+  .ps-label { font-size: .68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; }
+  .ps-value { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: #0a2342; line-height: 1; }
+  .ps-value span { font-size: 1rem; color: #94a3b8; }
+  .ps-sub { font-size: .72rem; color: #94a3b8; margin-top: 3px; }
+
+  /* ── FIELD ICON PREFIX ── */
+  .field-prefix {
+    position: relative;
+  }
+  .field-prefix .prefix-icon {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: .85rem;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .field-prefix .form-control,
+  .field-prefix .form-select {
+    padding-left: 36px !important;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+
+  <!-- Page Header -->
+  <div class="page-header-strip mb-4">
+    <div>
+      <div class="page-header-title">
+        <i class="bi bi-heart me-2" style="color:#dc2626;font-size:1.1rem;"></i>
+        Medical Profile
+      </div>
+      <div class="page-header-sub">Keep your health records updated for improved AI prediction accuracy</div>
+    </div>
+    <a href="{% url 'patient_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+    </a>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- ── MAIN FORM ── -->
+    <div class="col-lg-8">
+      <div class="card no-tilt">
+        <div class="card-body p-4 p-md-5">
+
+          <!-- Info banner -->
+          <div class="info-banner">
+            <i class="bi bi-info-circle-fill"></i>
+            <div class="info-banner-text">
+              <strong>Why this matters:</strong> Complete health profiles help our AI models factor in your pre-existing conditions, medications, and physical stats to deliver more accurate, personalised disease predictions.
+            </div>
+          </div>
+
+          <form method="post" novalidate>
+            {% csrf_token %}
+
+            <!-- ── SECTION 1: VITAL STATS ── -->
+            <div class="d-flex align-items-center gap-10 mb-3" style="gap:12px;">
+              <div class="sec-icon" style="background:#eff6ff;color:#1a4a8a;">
+                <i class="bi bi-activity"></i>
+              </div>
+              <div>
+                <div class="section-eyebrow" style="margin-bottom:2px;">Vital Statistics</div>
+                <div style="font-size:.78rem;color:#94a3b8;">Used to calculate BMI and baseline health indicators</div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-2">
+              <div class="col-md-4">
+                <label class="form-label">Blood Group</label>
+                <div class="field-prefix">
+                  <i class="bi bi-droplet prefix-icon"></i>
+                  {{ form.blood_group }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Height <span style="color:#94a3b8;font-size:.75rem;">(cm)</span></label>
+                <div class="field-prefix">
+                  <i class="bi bi-rulers prefix-icon"></i>
+                  {{ form.height }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Weight <span style="color:#94a3b8;font-size:.75rem;">(kg)</span></label>
+                <div class="field-prefix">
+                  <i class="bi bi-speedometer2 prefix-icon"></i>
+                  {{ form.weight }}
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section-div"></div>
+
+            <!-- ── SECTION 2: MEDICAL CONDITIONS ── -->
+            <div class="d-flex align-items-center gap-10 mb-3" style="gap:12px;">
+              <div class="sec-icon" style="background:#e0f7fa;color:#0e7490;">
+                <i class="bi bi-clipboard2-pulse"></i>
+              </div>
+              <div>
+                <div class="section-eyebrow" style="margin-bottom:2px;">Medical Conditions</div>
+                <div style="font-size:.78rem;color:#94a3b8;">Pre-existing conditions and known sensitivities</div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-2">
+              <div class="col-12">
+                <label class="form-label">Known Allergies</label>
+                {{ form.allergies }}
+                <div class="form-help"><i class="bi bi-info-circle"></i>Medications, food, environmental allergens (e.g. penicillin, peanuts, pollen)</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Chronic Conditions</label>
+                {{ form.chronic_conditions }}
+                <div class="form-help"><i class="bi bi-info-circle"></i>E.g. Type 2 Diabetes, Hypertension, Asthma, Hypothyroidism</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Current Medications</label>
+                {{ form.current_medications }}
+                <div class="form-help"><i class="bi bi-info-circle"></i>Include dosage if known (e.g. Metformin 500mg twice daily)</div>
+              </div>
+            </div>
+
+            <div class="form-section-div"></div>
+
+            <!-- ── SECTION 3: EMERGENCY & INSURANCE ── -->
+            <div class="d-flex align-items-center gap-10 mb-3" style="gap:12px;">
+              <div class="sec-icon" style="background:#fef2f2;color:#dc2626;">
+                <i class="bi bi-telephone-fill"></i>
+              </div>
+              <div>
+                <div class="section-eyebrow" style="margin-bottom:2px;">Emergency & Insurance</div>
+                <div style="font-size:.78rem;color:#94a3b8;">Critical contact information for medical emergencies</div>
+              </div>
+            </div>
+
+            <div class="critical-notice">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <div class="critical-notice-text">
+                <strong>Important:</strong> Emergency contact details are used if you are unable to communicate during a medical event. Please keep this information current and accurate.
+              </div>
+            </div>
+
+            <div class="row g-3 mb-2">
+              <div class="col-md-6">
+                <label class="form-label">Emergency Contact Name</label>
+                <div class="field-prefix">
+                  <i class="bi bi-person prefix-icon"></i>
+                  {{ form.emergency_contact_name }}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Emergency Contact Phone</label>
+                <div class="field-prefix">
+                  <i class="bi bi-telephone prefix-icon"></i>
+                  {{ form.emergency_contact_phone }}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Health Insurance Number</label>
+                <div class="field-prefix">
+                  <i class="bi bi-shield-check prefix-icon"></i>
+                  {{ form.insurance_number }}
+                </div>
+                <div class="form-help"><i class="bi bi-lock"></i>Stored securely and never shared</div>
+              </div>
+            </div>
+
+            <!-- ── SAVE AREA ── -->
+            <div class="save-area">
+              <div class="save-note">
+                <i class="bi bi-shield-fill-check" style="color:#10b981;"></i>
+                Your medical data is encrypted and stored securely.
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button type="submit" class="btn btn-primary px-4">
+                  <i class="bi bi-check2 me-2"></i>Save Medical Profile
+                </button>
+                <a href="{% url 'patient_dashboard' %}" class="btn btn-outline-secondary">
+                  Cancel
+                </a>
+              </div>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SIDEBAR ── -->
+    <div class="col-lg-4">
+
+      <!-- Profile completeness -->
+      <div class="card no-tilt mb-4">
+        <div class="card-header" style="font-family:'DM Serif Display',serif;font-size:.95rem;color:#0a2342;display:flex;align-items:center;gap:7px;">
+          <i class="bi bi-bar-chart-line" style="color:#0891b2;"></i> Profile Completeness
+        </div>
+        <div class="card-body p-4">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+            <span style="font-size:.82rem;color:#475569;">Your profile is</span>
+            <span style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:#0a2342;" id="completePct">—</span>
+          </div>
+          <div class="completeness-bar">
+            <div class="completeness-fill" id="completeFill" style="width:0%;"></div>
+          </div>
+          <div style="font-size:.72rem;color:#94a3b8;margin-top:6px;" id="completeMsg">Fill in the form to see your completion score</div>
+        </div>
+      </div>
+
+      <!-- Why it matters -->
+      <div class="card no-tilt mb-4">
+        <div class="card-header" style="font-family:'DM Serif Display',serif;font-size:.95rem;color:#0a2342;display:flex;align-items:center;gap:7px;">
+          <i class="bi bi-lightbulb" style="color:#d97706;"></i> Why It Matters
+        </div>
+        <div class="card-body p-4">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div style="width:30px;height:30px;border-radius:8px;background:#eff6ff;color:#1a4a8a;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;">
+                <i class="bi bi-cpu"></i>
+              </div>
+              <div>
+                <div style="font-size:.82rem;font-weight:600;color:#0f172a;margin-bottom:2px;">Better AI Predictions</div>
+                <div style="font-size:.75rem;color:#94a3b8;line-height:1.6;">BMI, blood group, and conditions help our models personalise results.</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div style="width:30px;height:30px;border-radius:8px;background:#ecfdf5;color:#059669;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;">
+                <i class="bi bi-shield-check"></i>
+              </div>
+              <div>
+                <div style="font-size:.82rem;font-weight:600;color:#0f172a;margin-bottom:2px;">Medication Safety</div>
+                <div style="font-size:.75rem;color:#94a3b8;line-height:1.6;">Known allergies help flag potential medication conflicts in recommendations.</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div style="width:30px;height:30px;border-radius:8px;background:#fef2f2;color:#dc2626;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;">
+                <i class="bi bi-telephone"></i>
+              </div>
+              <div>
+                <div style="font-size:.82rem;font-weight:600;color:#0f172a;margin-bottom:2px;">Emergency Readiness</div>
+                <div style="font-size:.75rem;color:#94a3b8;line-height:1.6;">Emergency contacts ensure your safety in critical situations.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Disclaimer -->
+      <div style="background:#fffbeb;border:1px solid rgba(217,119,6,.2);border-radius:12px;padding:14px 16px;">
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          <i class="bi bi-exclamation-triangle-fill" style="color:#d97706;font-size:.9rem;flex-shrink:0;margin-top:1px;"></i>
+          <div style="font-size:.75rem;color:#92400e;line-height:1.65;">
+            <strong>Medical Disclaimer:</strong> This profile is for AI prediction purposes only. It is not a substitute for a medical record or professional healthcare assessment.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Live profile completeness indicator */
+const fields = ['blood_group','height','weight','allergies','chronic_conditions','current_medications','emergency_contact_name','emergency_contact_phone','insurance_number'];
+
+function calcCompleteness() {
+  let filled = 0;
+  fields.forEach(f => {
+    const el = document.querySelector(`[name="${f}"]`);
+    if (el && el.value && el.value.trim() !== '') filled++;
+  });
+  const pct = Math.round((filled / fields.length) * 100);
+  document.getElementById('completePct').textContent = pct + '%';
+  document.getElementById('completeFill').style.width = pct + '%';
+
+  let msg = '';
+  if (pct === 100) msg = '✓ Profile is complete!';
+  else if (pct >= 66) msg = `${fields.length - filled} field${fields.length - filled > 1 ? 's' : ''} remaining`;
+  else if (pct >= 33) msg = 'Good start — keep going!';
+  else msg = 'Fill in the form to see your score';
+  document.getElementById('completeMsg').textContent = msg;
+}
+
+fields.forEach(f => {
+  const el = document.querySelector(`[name="${f}"]`);
+  if (el) el.addEventListener('input', calcCompleteness);
+});
+
+/* Initial calculation */
+setTimeout(calcCompleteness, 300);
+
+/* Apply form-control classes to Django form fields */
+document.querySelectorAll('input:not([type=checkbox]):not([type=radio]),textarea,select').forEach(el => {
+  if (!el.classList.contains('form-control') && !el.classList.contains('form-select')) {
+    el.classList.add(el.tagName === 'SELECT' ? 'form-select' : 'form-control');
+  }
+});
+</script>
+{% endblock %}

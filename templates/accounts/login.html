@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In | HealthPredict AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:#0a2342; --navy-mid:#113568; --teal:#0891b2; --teal-mid:#0e7490;
+      --teal-l:#22d3ee; --teal-pale:#e0f7fa; --mint:#10b981; --mint-pale:#ecfdf5;
+      --red:#dc2626; --bg:#f0f4f8; --white:#fff;
+      --border:#e2e8f0; --border-m:#cbd5e1;
+      --t1:#0f172a; --t2:#475569; --tm:#94a3b8;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;}
+
+    /* ── LEFT PANEL ── */
+    .left-panel{background:var(--navy);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:60px 56px;min-height:100vh;}
+    .left-panel::before{content:'';position:absolute;inset:0;
+      background-image:radial-gradient(rgba(255,255,255,0.04) 1px,transparent 1px);
+      background-size:28px 28px;pointer-events:none;}
+    .left-panel::after{content:'';position:absolute;inset:0;
+      background:radial-gradient(ellipse 70% 60% at 30% 20%,rgba(8,145,178,0.2) 0%,transparent 55%),
+                radial-gradient(ellipse 50% 50% at 80% 90%,rgba(16,185,129,0.1) 0%,transparent 50%);
+      pointer-events:none;}
+
+    /* top accent */
+    .left-panel .top-bar{position:absolute;top:0;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,var(--teal),var(--mint),var(--teal));
+      background-size:200%;animation:bs 4s ease-in-out infinite;}
+    @keyframes bs{0%,100%{background-position:0%}50%{background-position:100%}}
+
+    /* floating crosses */
+    .med-cross{position:absolute;pointer-events:none;opacity:.07;}
+    .med-cross::before,.med-cross::after{content:'';position:absolute;background:#fff;border-radius:2px;}
+    .med-cross::before{width:10px;height:32px;top:50%;left:50%;transform:translate(-50%,-50%);}
+    .med-cross::after{width:32px;height:10px;top:50%;left:50%;transform:translate(-50%,-50%);}
+    .mc1{top:8%;left:8%;animation:mf 9s ease-in-out infinite;}
+    .mc2{top:20%;right:12%;animation:mf 11s ease-in-out infinite reverse;scale:1.4;}
+    .mc3{bottom:15%;left:15%;animation:mf 8s ease-in-out infinite 2s;scale:.8;}
+    .mc4{bottom:25%;right:8%;animation:mf 10s ease-in-out infinite 1s;scale:1.2;}
+    @keyframes mf{0%,100%{transform:translateY(0) rotate(0)}33%{transform:translateY(-14px) rotate(8deg)}66%{transform:translateY(8px) rotate(-5deg)}}
+
+    /* EKG line */
+    .ekg-wrap{width:100%;height:44px;margin:28px 0;opacity:.55;}
+    .ekg-svg{width:100%;height:100%;overflow:visible;}
+    .ekg-path{fill:none;stroke:var(--teal-l);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+      stroke-dasharray:500;stroke-dashoffset:500;animation:dl 2s .4s ease forwards,pf 3s 2.4s ease-in-out infinite;}
+    @keyframes dl{to{stroke-dashoffset:0}}
+    @keyframes pf{0%,100%{opacity:.45}50%{opacity:.9}}
+
+    .lp-content{position:relative;z-index:2;}
+    .lp-brand{display:flex;align-items:center;gap:12px;margin-bottom:48px;animation:fu .6s ease both;}
+    .lp-bmark{width:44px;height:44px;border-radius:12px;
+      background:linear-gradient(135deg,rgba(8,145,178,.3),rgba(16,185,129,.2));
+      border:1px solid rgba(8,145,178,.4);display:flex;align-items:center;justify-content:center;
+      animation:mp 3s ease-in-out infinite;}
+    @keyframes mp{0%,100%{box-shadow:0 0 0 0 rgba(8,145,178,.3)}50%{box-shadow:0 0 0 10px rgba(8,145,178,0)}}
+    .lp-bmark i{color:#f87171;font-size:1.2rem;}
+    .lp-bname{font-family:'DM Serif Display',serif;font-size:1.2rem;color:#fff;}
+    .lp-bname span{color:var(--teal-l);}
+
+    .lp-heading{font-family:'DM Serif Display',serif;font-size:2.6rem;color:#fff;line-height:1.1;letter-spacing:-1px;margin-bottom:14px;animation:fu .6s .1s ease both;}
+    .lp-heading em{color:var(--teal-l);font-style:italic;}
+    .lp-sub{font-size:.9rem;color:rgba(255,255,255,.55);line-height:1.8;max-width:380px;font-weight:300;animation:fu .6s .2s ease both;}
+
+    .lp-stats{display:flex;gap:28px;margin-top:40px;animation:fu .6s .35s ease both;}
+    .lp-stat .n{font-family:'DM Serif Display',serif;font-size:1.8rem;color:#fff;line-height:1;}
+    .lp-stat .n span{color:var(--teal-l);}
+    .lp-stat .l{font-size:.68rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+    .lp-stat-div{width:1px;background:rgba(255,255,255,.1);align-self:stretch;}
+
+    .lp-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:32px;animation:fu .6s .45s ease both;}
+    .lp-pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);
+      padding:5px 12px;border-radius:20px;font-size:.73rem;}
+    .lp-pill i{color:var(--teal-l);font-size:.75rem;}
+
+    @keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+    /* ── RIGHT PANEL ── */
+    .right-panel{display:flex;align-items:center;justify-content:center;padding:40px 48px;background:var(--bg);overflow-y:auto;}
+    .form-box{width:100%;max-width:420px;}
+
+    .back-link{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:var(--tm);text-decoration:none;margin-bottom:28px;transition:color .2s;}
+    .back-link:hover{color:var(--teal-mid);}
+
+    .form-title{font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--navy);letter-spacing:-.5px;margin-bottom:4px;}
+    .form-sub{font-size:.85rem;color:var(--tm);margin-bottom:32px;}
+
+    /* alerts */
+    .alert{border-radius:10px;font-size:.84rem;border:1px solid transparent;padding:10px 14px;margin-bottom:16px;}
+    .alert-danger{background:#fef2f2;border-color:rgba(220,38,38,.2);color:var(--red);}
+    .alert-success{background:var(--mint-pale);border-color:rgba(16,185,129,.2);color:#047857;}
+    .alert-warning{background:#fffbeb;border-color:rgba(217,119,6,.2);color:#92400e;}
+    .alert-info{background:var(--teal-pale);border-color:rgba(8,145,178,.2);color:var(--teal-mid);}
+
+    /* form fields */
+    .field-group{margin-bottom:18px;}
+    .field-label{font-size:.78rem;font-weight:600;color:var(--t2);margin-bottom:6px;display:block;letter-spacing:.2px;}
+    .field-wrap{position:relative;}
+    .field-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--tm);font-size:.95rem;pointer-events:none;z-index:2;}
+    .form-control{width:100%;background:var(--white);border:1.5px solid var(--border);border-radius:10px;
+      padding:11px 14px 11px 38px;font-family:'DM Sans',sans-serif;font-size:.875rem;color:var(--t1);
+      transition:all .2s ease;outline:none;}
+    .form-control:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(8,145,178,.1);}
+    .form-control::placeholder{color:var(--tm);}
+
+    .btn-signin{width:100%;background:linear-gradient(135deg,var(--navy),var(--navy-mid));border:none;
+      color:#fff;padding:13px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;
+      cursor:pointer;transition:all .22s ease;box-shadow:0 4px 14px rgba(10,35,66,.2);
+      display:flex;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden;}
+    .btn-signin::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
+      transform:translateX(-100%);transition:transform .4s;}
+    .btn-signin:hover::before{transform:translateX(100%);}
+    .btn-signin:hover{background:linear-gradient(135deg,var(--navy-mid),var(--teal-mid));
+      box-shadow:0 6px 22px rgba(8,145,178,.3);transform:translateY(-1px);}
+
+    .divider-wrap{display:flex;align-items:center;gap:12px;margin:22px 0;}
+    .divider-line{flex:1;height:1px;background:var(--border);}
+    .divider-text{font-size:.75rem;color:var(--tm);white-space:nowrap;}
+
+    .btn-reg{width:100%;background:var(--white);border:1.5px solid var(--border);
+      color:var(--t2);padding:11px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;
+      cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;
+      text-decoration:none;margin-bottom:9px;}
+    .btn-reg:hover{border-color:var(--teal);color:var(--teal-mid);background:var(--teal-pale);transform:translateY(-1px);}
+    .btn-reg-doctor{border-color:rgba(10,35,66,.15);color:var(--navy);}
+    .btn-reg-doctor:hover{border-color:var(--navy);color:var(--navy);background:#eff6ff;}
+
+    .form-foot{text-align:center;font-size:.75rem;color:var(--tm);margin-top:20px;}
+
+    @media(max-width:860px){
+      body{grid-template-columns:1fr;}
+      .left-panel{display:none;}
+      .right-panel{padding:32px 20px;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── LEFT PANEL ── -->
+<div class="left-panel">
+  <div class="top-bar"></div>
+  <div class="med-cross mc1"></div>
+  <div class="med-cross mc2"></div>
+  <div class="med-cross mc3"></div>
+  <div class="med-cross mc4"></div>
+
+  <div class="lp-content">
+    <div class="lp-brand">
+      <div class="lp-bmark"><i class="bi bi-heart-pulse-fill"></i></div>
+      <div class="lp-bname">Health<span>Predict</span> AI</div>
+    </div>
+
+    <h1 class="lp-heading">Intelligent<br>Healthcare at<br><em>Your Fingertips</em></h1>
+    <p class="lp-sub">Sign in to access AI-powered disease predictions, personalized treatment plans, and specialist recommendations — all in one clinical platform.</p>
+
+    <div class="ekg-wrap">
+      <svg class="ekg-svg" viewBox="0 0 420 44" preserveAspectRatio="none">
+        <path class="ekg-path" d="M0,22 L60,22 L72,22 L80,5 L88,38 L96,5 L104,38 L112,22 L130,22 L145,22 L152,8 L160,36 L168,8 L176,36 L184,22 L200,22 L212,22 L218,10 L224,34 L230,22 L260,22 L420,22"/>
+      </svg>
+    </div>
+
+    <div class="lp-stats">
+      <div class="lp-stat">
+        <div class="n">41<span>+</span></div>
+        <div class="l">Diseases</div>
+      </div>
+      <div class="lp-stat-div"></div>
+      <div class="lp-stat">
+        <div class="n">132<span>+</span></div>
+        <div class="l">Symptoms</div>
+      </div>
+      <div class="lp-stat-div"></div>
+      <div class="lp-stat">
+        <div class="n">95<span>%+</span></div>
+        <div class="l">Accuracy</div>
+      </div>
+    </div>
+
+    <div class="lp-pills">
+      <div class="lp-pill"><i class="bi bi-cpu"></i> ML Predictions</div>
+      <div class="lp-pill"><i class="bi bi-shield-check"></i> Secure &amp; Private</div>
+      <div class="lp-pill"><i class="bi bi-people"></i> Find Doctors</div>
+      <div class="lp-pill"><i class="bi bi-file-earmark-pdf"></i> PDF Reports</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── RIGHT PANEL ── -->
+<div class="right-panel">
+  <div class="form-box">
+    <a href="/" class="back-link"><i class="bi bi-arrow-left"></i> Back to Home</a>
+
+    <div class="form-title">Welcome Back</div>
+    <div class="form-sub">Sign in to your healthcare dashboard</div>
+
+    {% if messages %}
+      {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
+        {{ msg }}
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" style="float:right;background:none;border:none;cursor:pointer;opacity:.5;">✕</button>
+      </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <div class="field-group">
+        <label class="field-label">Username</label>
+        <div class="field-wrap">
+          <i class="bi bi-person field-icon"></i>
+          {{ form.username }}
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <div class="field-wrap">
+          <i class="bi bi-lock field-icon"></i>
+          {{ form.password }}
+        </div>
+      </div>
+
+      <button type="submit" class="btn-signin">
+        <i class="bi bi-box-arrow-in-right"></i> Sign In to Dashboard
+      </button>
+    </form>
+
+    <div class="divider-wrap">
+      <div class="divider-line"></div>
+      <div class="divider-text">New to HealthPredict?</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <a href="{% url 'register_patient' %}" class="btn-reg">
+      <i class="bi bi-person-plus"></i> Register as Patient
+    </a>
+    <a href="{% url 'register_doctor' %}" class="btn-reg btn-reg-doctor">
+      <i class="bi bi-clipboard2-pulse"></i> Register as Doctor
+    </a>
+
+    <div class="form-foot">
+      HealthPredict AI &middot; For educational purposes only<br>
+      Always consult a licensed physician for medical decisions.
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  /* Add form-control class to Django form fields */
+  document.querySelectorAll('input[type=text], input[type=password], input[type=email]').forEach(el => {
+    el.classList.add('form-control');
+    el.style.paddingLeft = '38px';
+  });
+</script>
+</body>
+</html>
