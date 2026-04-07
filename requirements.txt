@@ -17,3 +17,6 @@ threadpoolctl==3.6.0
 tzdata==2026.1
 whitenoise==6.12.0
 gunicorn==21.2.0
+psycopg2-binary==2.9.9  # For future PostgreSQL upgrade
+celery==5.4.0           # If using Celery
+redis==5.0.8            # If using Redis
