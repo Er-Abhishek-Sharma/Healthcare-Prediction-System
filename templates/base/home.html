@@ -6,925 +6,562 @@
     <title>HealthPredict AI — Intelligent Disease Prediction System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <style>
-        :root {
-            /* Hospital Professional Palette */
-            --navy:       #0a2342;
-            --navy-mid:   #113568;
-            --navy-light: #1a4a8a;
-            --teal:       #0891b2;
-            --teal-light: #22d3ee;
-            --teal-pale:  #e0f7fa;
-            --mint:       #10b981;
-            --mint-pale:  #ecfdf5;
-            --red-med:    #dc2626;
-            --white:      #ffffff;
-            --off-white:  #f8fafc;
-            --slate-50:   #f8fafc;
-            --slate-100:  #f1f5f9;
-            --slate-200:  #e2e8f0;
-            --slate-400:  #94a3b8;
-            --slate-600:  #475569;
-            --slate-700:  #334155;
-            --slate-900:  #0f172a;
-            --shadow-sm:  0 1px 3px rgba(10,35,66,0.08), 0 1px 2px rgba(10,35,66,0.05);
-            --shadow-md:  0 4px 16px rgba(10,35,66,0.10), 0 2px 6px rgba(10,35,66,0.07);
-            --shadow-lg:  0 20px 60px rgba(10,35,66,0.14), 0 8px 24px rgba(10,35,66,0.09);
-            --shadow-xl:  0 40px 100px rgba(10,35,66,0.18);
-        }
+    /* ═══════════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════════ */
+    :root {
+        --navy:       #0a2342;
+        --navy-mid:   #113568;
+        --navy-light: #1a4a8a;
+        --teal:       #0891b2;
+        --teal-mid:   #0e7490;
+        --teal-light: #22d3ee;
+        --teal-pale:  #e0f7fa;
+        --mint:       #10b981;
+        --mint-pale:  #ecfdf5;
+        --red:        #dc2626;
+        --amber:      #d97706;
+        --white:      #ffffff;
+        --off-white:  #f8fafc;
+        --s50:  #f8fafc; --s100: #f1f5f9; --s200: #e2e8f0;
+        --s400: #94a3b8; --s600: #475569; --s700: #334155; --s900: #0f172a;
+        --sh-sm: 0 1px 3px rgba(10,35,66,.08), 0 1px 2px rgba(10,35,66,.05);
+        --sh-md: 0 4px 16px rgba(10,35,66,.10), 0 2px 6px rgba(10,35,66,.07);
+        --sh-lg: 0 20px 60px rgba(10,35,66,.14), 0 8px 24px rgba(10,35,66,.09);
+        --sh-xl: 0 40px 100px rgba(10,35,66,.18);
+        --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px;
+    }
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--white);
-            color: var(--slate-700);
-            overflow-x: hidden;
-        }
+    body {
+        font-family: 'DM Sans', sans-serif;
+        background: var(--white);
+        color: var(--s700);
+        overflow-x: hidden;
+    }
+    h1, h2, h3 { font-family: 'DM Serif Display', serif; }
 
-        h1, h2, h3 {
-            font-family: 'DM Serif Display', serif;
-        }
+    /* ═══════════════════════════════════════════
+       PARTICLE CANVAS
+    ═══════════════════════════════════════════ */
+    #particles {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        pointer-events: none;
+        z-index: 0;
+    }
 
-        /* ── NAVBAR ── */
-        .navbar-hp {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-            padding: 0 56px;
-            height: 72px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255,255,255,0.96);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--slate-200);
-            transition: box-shadow 0.3s ease;
-        }
-        .navbar-hp.scrolled {
-            box-shadow: var(--shadow-md);
-        }
+    /* ═══════════════════════════════════════════
+       NAVBAR
+    ═══════════════════════════════════════════ */
+    .navbar-hp {
+        position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+        height: 68px; padding: 0 52px;
+        display: flex; align-items: center; justify-content: space-between;
+        background: rgba(255,255,255,.96);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--s200);
+        transition: box-shadow .3s, background .3s;
+    }
+    .navbar-hp.scrolled { box-shadow: var(--sh-md); }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-        .brand-mark {
-            width: 42px; height: 42px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--navy), var(--teal));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(8,145,178,0.3);
-        }
-        .brand-mark i { color: #fff; font-size: 1.1rem; }
-        .brand-name {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.25rem;
-            color: var(--navy);
-            letter-spacing: -0.3px;
-        }
-        .brand-name span { color: var(--teal); }
-        .brand-badge {
-            font-size: 0.6rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            background: var(--teal-pale);
-            color: var(--teal);
-            padding: 2px 7px;
-            border-radius: 4px;
-            margin-left: 2px;
-            vertical-align: middle;
-        }
+    .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+    .brand-mark {
+        width: 40px; height: 40px; border-radius: 10px;
+        background: linear-gradient(135deg, var(--navy), var(--teal));
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 12px rgba(8,145,178,.3);
+        animation: brandPulse 3s ease-in-out infinite;
+    }
+    @keyframes brandPulse {
+        0%,100%{ box-shadow: 0 4px 12px rgba(8,145,178,.3); }
+        50%    { box-shadow: 0 4px 22px rgba(8,145,178,.55); }
+    }
+    .brand-mark i { color: #fff; font-size: 1.05rem; }
+    .brand-name { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--navy); letter-spacing: -.3px; }
+    .brand-name span { color: var(--teal); }
+    .brand-badge {
+        font-size: .58rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+        background: var(--teal-pale); color: var(--teal);
+        padding: 2px 7px; border-radius: 4px; margin-left: 2px; vertical-align: middle;
+    }
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .nav-link-hp {
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.88rem;
-            font-weight: 500;
-            color: var(--slate-600);
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        .nav-link-hp:hover {
-            color: var(--navy);
-            background: var(--slate-100);
-        }
+    .nav-links { display: flex; align-items: center; gap: 6px; }
+    .nav-lnk {
+        padding: 7px 14px; border-radius: var(--r-sm);
+        font-size: .875rem; font-weight: 500; color: var(--s600);
+        text-decoration: none; transition: all .2s;
+    }
+    .nav-lnk:hover { color: var(--navy); background: var(--s100); }
 
-        .btn-nav-outline {
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: var(--navy);
-            border: 1.5px solid var(--slate-200);
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        .btn-nav-outline:hover {
-            border-color: var(--teal);
-            color: var(--teal);
-            background: var(--teal-pale);
-        }
+    .btn-outline-nav {
+        padding: 7px 18px; border-radius: var(--r-sm); font-size: .875rem; font-weight: 600;
+        color: var(--navy); border: 1.5px solid var(--s200);
+        text-decoration: none; transition: all .2s;
+    }
+    .btn-outline-nav:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-pale); }
 
-        .btn-nav-primary {
-            padding: 9px 22px;
-            border-radius: 8px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: #fff;
-            background: linear-gradient(135deg, var(--navy), var(--navy-light));
-            text-decoration: none;
-            transition: all 0.25s;
-            box-shadow: 0 4px 14px rgba(10,35,66,0.25);
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-        }
-        .btn-nav-primary:hover {
-            background: linear-gradient(135deg, var(--navy-light), var(--teal));
-            box-shadow: 0 6px 22px rgba(8,145,178,0.35);
-            color: #fff;
-            transform: translateY(-1px);
-        }
+    .btn-primary-nav {
+        padding: 8px 20px; border-radius: var(--r-sm); font-size: .875rem; font-weight: 600;
+        color: #fff; background: linear-gradient(135deg, var(--navy), var(--navy-light));
+        text-decoration: none; transition: all .25s;
+        box-shadow: 0 4px 14px rgba(10,35,66,.25);
+        display: inline-flex; align-items: center; gap: 6px;
+        position: relative; overflow: hidden;
+    }
+    .btn-primary-nav::before {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
+        transform: translateX(-100%); transition: transform .4s;
+    }
+    .btn-primary-nav:hover::before { transform: translateX(100%); }
+    .btn-primary-nav:hover {
+        background: linear-gradient(135deg, var(--navy-light), var(--teal-mid));
+        box-shadow: 0 6px 22px rgba(8,145,178,.4); color: #fff; transform: translateY(-1px);
+    }
 
-        /* ── HERO ── */
-        .hero {
-            min-height: 100vh;
-            background: var(--navy);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+    /* Mobile nav */
+    .nav-hamburger {
+        display: none; background: none; border: 1.5px solid var(--s200);
+        border-radius: var(--r-sm); padding: 6px 10px; cursor: pointer;
+        color: var(--navy); font-size: 1.1rem;
+    }
+    .mobile-nav {
+        display: none; position: fixed; top: 68px; left: 0; right: 0; z-index: 999;
+        background: rgba(255,255,255,.98); backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--s200); padding: 16px 24px;
+        flex-direction: column; gap: 8px;
+        animation: slideDown .25s ease;
+    }
+    .mobile-nav.open { display: flex; }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:none} }
+    .mobile-nav .nav-lnk { padding: 10px 12px; width: 100%; }
+    .mobile-nav .btn-outline-nav,
+    .mobile-nav .btn-primary-nav { width: 100%; justify-content: center; padding: 11px; }
 
-        /* Clean geometric hero background */
-        .hero-bg-pattern {
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(ellipse 70% 60% at 100% 50%, rgba(8,145,178,0.18) 0%, transparent 55%),
-                radial-gradient(ellipse 50% 50% at 0% 100%, rgba(16,185,129,0.08) 0%, transparent 50%),
-                linear-gradient(160deg, #0a2342 0%, #0f2d55 50%, #0a2342 100%);
-            z-index: 0;
-        }
+    /* ═══════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════ */
+    .hero {
+        min-height: 100vh; background: var(--navy);
+        position: relative; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .hero-bg {
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 70% 60% at 100% 50%, rgba(8,145,178,.18) 0%, transparent 55%),
+            radial-gradient(ellipse 50% 50% at 0% 100%, rgba(16,185,129,.08) 0%, transparent 50%),
+            linear-gradient(160deg, #0a2342 0%, #0f2d55 50%, #0a2342 100%);
+        z-index: 1;
+    }
+    .hero-dots {
+        position: absolute; inset: 0; z-index: 1;
+        background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+        background-size: 28px 28px;
+        mask-image: linear-gradient(180deg, transparent 0%, black 15%, black 85%, transparent 100%);
+    }
+    .hero-rings {
+        position: absolute; right: 0; top: 0; width: 55%; height: 100%; z-index: 1; overflow: hidden;
+    }
+    .hero-rings::before {
+        content: ''; position: absolute; top: 50%; right: -10%; width: 90%; height: 90%;
+        transform: translateY(-50%); border-radius: 50%;
+        border: 1px solid rgba(255,255,255,.04);
+        box-shadow: 0 0 0 60px rgba(255,255,255,.022), 0 0 0 120px rgba(255,255,255,.013), 0 0 0 200px rgba(255,255,255,.007);
+        animation: ringBreath 8s ease-in-out infinite;
+    }
+    @keyframes ringBreath { 0%,100%{transform:translateY(-50%) scale(1)} 50%{transform:translateY(-52%) scale(1.02)} }
 
-        /* Subtle dot matrix */
-        .hero-dots {
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
-            background-size: 28px 28px;
-            z-index: 0;
-            mask-image: linear-gradient(180deg, transparent 0%, black 20%, black 80%, transparent 100%);
-        }
+    /* EKG line across hero */
+    .hero-ekg {
+        position: absolute; bottom: 130px; left: 0; right: 0; z-index: 1;
+        height: 40px; overflow: visible; pointer-events: none; opacity: .18;
+    }
+    .hero-ekg-path {
+        fill: none; stroke: var(--teal-light); stroke-width: 1.5;
+        stroke-linecap: round; stroke-linejoin: round;
+        stroke-dasharray: 1400; stroke-dashoffset: 1400;
+        animation: ekgDraw 3s 1s ease forwards, ekgLoop 4s 4s ease-in-out infinite;
+    }
+    @keyframes ekgDraw { to { stroke-dashoffset: 0; } }
+    @keyframes ekgLoop { 0%,100%{opacity:.18} 50%{opacity:.4} }
 
-        /* Horizontal rule lines – medical aesthetic */
-        .hero-lines {
-            position: absolute;
-            right: 0; top: 0;
-            width: 55%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
-        }
-        .hero-lines::before {
-            content: '';
-            position: absolute;
-            top: 50%; right: -10%;
-            width: 90%; height: 90%;
-            transform: translateY(-50%);
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.04);
-            box-shadow:
-                0 0 0 60px rgba(255,255,255,0.025),
-                0 0 0 120px rgba(255,255,255,0.015),
-                0 0 0 200px rgba(255,255,255,0.008);
-        }
+    .hero-inner {
+        position: relative; z-index: 2; flex: 1;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+        align-items: center; max-width: 1240px; margin: 0 auto;
+        padding: 120px 56px 80px; width: 100%;
+    }
 
-        .hero-inner {
-            position: relative;
-            z-index: 2;
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-            max-width: 1240px;
-            margin: 0 auto;
-            padding: 120px 56px 60px;
-            width: 100%;
-        }
+    /* Pill */
+    .hero-pill {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: rgba(8,145,178,.15); border: 1px solid rgba(8,145,178,.3);
+        color: var(--teal-light); padding: 5px 14px; border-radius: 30px;
+        font-size: .72rem; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase;
+        margin-bottom: 22px; width: fit-content;
+        animation: fadeUp .7s ease both;
+    }
+    .live-dot {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--mint); box-shadow: 0 0 8px var(--mint);
+        animation: liveBlink 2s ease-in-out infinite;
+    }
+    @keyframes liveBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-        /* Pill badge */
-        .hero-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(8,145,178,0.15);
-            border: 1px solid rgba(8,145,178,0.3);
-            color: var(--teal-light);
-            padding: 5px 14px;
-            border-radius: 30px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            margin-bottom: 22px;
-            width: fit-content;
-            animation: fadeUp 0.7s ease both;
-        }
-        .live-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--mint);
-            box-shadow: 0 0 8px var(--mint);
-            animation: liveBlink 2s ease-in-out infinite;
-        }
-        @keyframes liveBlink { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+    .hero-title {
+        font-size: clamp(2.4rem, 4.5vw, 4rem); font-weight: 400; color: #fff;
+        line-height: 1.08; letter-spacing: -1.5px; margin-bottom: 20px;
+        animation: fadeUp .7s .12s ease both;
+    }
+    .hero-title em { font-style: italic; color: var(--teal-light); }
 
-        .hero-title {
-            font-size: clamp(2.6rem, 4.5vw, 4.2rem);
-            font-weight: 400;
-            color: #fff;
-            line-height: 1.1;
-            letter-spacing: -1.5px;
-            margin-bottom: 20px;
-            animation: fadeUp 0.7s 0.12s ease both;
-        }
-        .hero-title em {
-            font-style: italic;
-            color: var(--teal-light);
-        }
+    .hero-sub {
+        font-size: 1rem; color: rgba(255,255,255,.58); line-height: 1.8; max-width: 480px;
+        margin-bottom: 36px; font-weight: 300; animation: fadeUp .7s .24s ease both;
+    }
 
-        .hero-sub {
-            font-size: 1rem;
-            color: rgba(255,255,255,0.6);
-            line-height: 1.8;
-            max-width: 480px;
-            margin-bottom: 38px;
-            font-weight: 300;
-            animation: fadeUp 0.7s 0.24s ease both;
-        }
+    .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; animation: fadeUp .7s .36s ease both; }
 
-        .hero-ctas {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            animation: fadeUp 0.7s 0.36s ease both;
-        }
+    .btn-hero-white {
+        padding: 13px 28px; border-radius: 10px;
+        font-family: 'DM Sans', sans-serif; font-size: .95rem; font-weight: 600;
+        color: var(--navy); background: #fff; text-decoration: none;
+        display: inline-flex; align-items: center; gap: 8px;
+        transition: all .25s; box-shadow: 0 8px 30px rgba(0,0,0,.2);
+        position: relative; overflow: hidden;
+    }
+    .btn-hero-white::after {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(8,145,178,.08), transparent);
+        opacity: 0; transition: opacity .3s;
+    }
+    .btn-hero-white:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(0,0,0,.3); color: var(--navy); }
+    .btn-hero-white:hover::after { opacity: 1; }
 
-        .btn-hero-main {
-            padding: 14px 30px;
-            border-radius: 10px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--navy);
-            background: #fff;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.25s ease;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-hero-main::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(8,145,178,0.08), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .btn-hero-main:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 14px 40px rgba(0,0,0,0.3);
-            color: var(--navy);
-        }
-        .btn-hero-main:hover::after { opacity: 1; }
+    .btn-hero-ghost {
+        padding: 13px 26px; border-radius: 10px;
+        font-family: 'DM Sans', sans-serif; font-size: .95rem; font-weight: 500;
+        color: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.2);
+        text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+        transition: all .25s;
+    }
+    .btn-hero-ghost:hover { border-color: rgba(255,255,255,.5); color: #fff; background: rgba(255,255,255,.07); }
 
-        .btn-hero-ghost {
-            padding: 14px 28px;
-            border-radius: 10px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: rgba(255,255,255,0.8);
-            border: 1px solid rgba(255,255,255,0.2);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.25s ease;
-        }
-        .btn-hero-ghost:hover {
-            border-color: rgba(255,255,255,0.5);
-            color: #fff;
-            background: rgba(255,255,255,0.07);
-        }
+    /* ── 3D Hero Card ── */
+    .hero-right { display: flex; align-items: center; justify-content: center; animation: fadeUp .8s .4s ease both; }
+    .card-stack { position: relative; width: 100%; max-width: 380px; }
+    .card-stack::before {
+        content: ''; position: absolute; inset: 0;
+        background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08);
+        border-radius: 20px; transform: rotate(3.5deg) translate(12px, 12px);
+        transition: transform .3s ease;
+    }
+    .card-stack::after {
+        content: ''; position: absolute; inset: 0;
+        background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06);
+        border-radius: 20px; transform: rotate(-2deg) translate(-7px, 7px);
+    }
+    .main-card {
+        background: #fff; border-radius: 20px; padding: 26px;
+        box-shadow: var(--sh-xl); position: relative; z-index: 2;
+        animation: cardFloat 5s ease-in-out infinite;
+        transition: transform .15s ease;
+    }
+    @keyframes cardFloat {
+        0%,100%{ transform: translateY(0) rotateX(2deg) rotateY(-2deg); }
+        50%     { transform: translateY(-12px) rotateX(1deg) rotateY(-1deg); }
+    }
 
-        /* ── HERO RIGHT — 3D CARD ── */
-        .hero-right {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeUp 0.8s 0.4s ease both;
-        }
-        .card-stack {
-            position: relative;
-            width: 100%;
-            max-width: 380px;
-        }
+    .card-hdr {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--s100);
+    }
+    .card-hdr-title { font-size: .77rem; font-weight: 600; color: var(--navy); letter-spacing: .3px; }
+    .card-status {
+        display: flex; align-items: center; gap: 5px;
+        font-size: .64rem; color: var(--mint); font-weight: 600;
+        background: var(--mint-pale); padding: 3px 8px; border-radius: 20px;
+    }
 
-        /* Back card (shadow card) */
-        .card-stack::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
-            transform: rotate(3deg) translate(10px, 10px);
-        }
-        .card-stack::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 20px;
-            transform: rotate(-2deg) translate(-6px, 6px);
-        }
+    .result-disease {
+        font-family: 'DM Serif Display', serif; font-size: 1.45rem;
+        color: var(--navy); margin-bottom: 6px;
+    }
+    .conf-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+    .conf-num { font-size: .75rem; font-weight: 700; color: var(--teal); }
+    .conf-track { flex: 1; height: 5px; background: var(--s100); border-radius: 5px; overflow: hidden; }
+    .conf-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--mint)); border-radius: 5px; animation: barGrow 1.2s .8s ease both; }
+    @keyframes barGrow { from{width:0!important} }
 
-        .main-card {
-            background: #fff;
-            border-radius: 20px;
-            padding: 28px;
-            box-shadow: var(--shadow-xl);
-            position: relative;
-            z-index: 2;
-            animation: cardFloat 5s ease-in-out infinite;
-        }
-        @keyframes cardFloat {
-            0%,100% { transform: translateY(0) rotateX(2deg) rotateY(-2deg); }
-            50%      { transform: translateY(-10px) rotateX(1deg) rotateY(-1deg); }
-        }
+    .result-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 16px; }
+    .rtag { font-size: .67rem; font-weight: 600; padding: 3px 9px; border-radius: 6px; }
+    .rtag-blue  { background:#eff6ff; color:#1d4ed8; }
+    .rtag-teal  { background:var(--teal-pale); color:var(--teal); }
+    .rtag-green { background:var(--mint-pale); color:#059669; }
+    .rtag-red   { background:#fef2f2; color:var(--red); }
 
-        .card-header-hp {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--slate-100);
-        }
-        .card-header-title {
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--navy);
-            letter-spacing: 0.3px;
-        }
-        .card-status {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.65rem;
-            color: var(--mint);
-            font-weight: 600;
-            background: var(--mint-pale);
-            padding: 3px 8px;
-            border-radius: 20px;
-        }
+    .card-data-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 7px 0; border-bottom: 1px solid var(--s100); font-size: .77rem;
+    }
+    .card-data-row:last-child { border-bottom: none; }
+    .cdr-lbl { color: var(--s400); font-weight: 500; }
+    .cdr-val { color: var(--s700); font-weight: 600; }
+    .cdr-val.accent { color: var(--teal); }
 
-        .result-disease {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.5rem;
-            color: var(--navy);
-            margin-bottom: 6px;
-        }
-        .result-conf-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        .result-conf-num {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--teal);
-        }
-        .result-conf-bar-wrap {
-            flex: 1;
-            height: 5px;
-            background: var(--slate-100);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        .result-conf-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--teal), var(--mint));
-            border-radius: 5px;
-            animation: barGrow 1.2s 0.8s ease both;
-        }
-        @keyframes barGrow { from{width:0!important} }
+    /* ── Stats Strip ── */
+    .stats-strip {
+        position: relative; z-index: 2;
+        background: var(--teal); padding: 26px 56px;
+        display: flex; justify-content: center; gap: 0;
+    }
+    .stat-item { flex: 1; max-width: 220px; text-align: center; padding: 4px 22px; border-right: 1px solid rgba(255,255,255,.15); }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-family: 'DM Serif Display', serif; font-size: 2.3rem; color: #fff; line-height: 1; }
+    .stat-lbl { font-size: .73rem; color: rgba(255,255,255,.7); font-weight: 500; margin-top: 3px; letter-spacing: .3px; }
 
-        .result-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 18px;
-        }
-        .rtag {
-            font-size: 0.68rem;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 6px;
-            letter-spacing: 0.3px;
-        }
-        .rtag-blue  { background: #eff6ff; color: #1d4ed8; }
-        .rtag-teal  { background: var(--teal-pale); color: var(--teal); }
-        .rtag-green { background: var(--mint-pale); color: #059669; }
-        .rtag-red   { background: #fef2f2; color: var(--red-med); }
+    /* ── Trust Bar ── */
+    .trust-bar {
+        background: var(--s50); border-top: 1px solid var(--s200); border-bottom: 1px solid var(--s200);
+        padding: 16px 56px; display: flex; align-items: center; justify-content: center;
+        gap: 44px; flex-wrap: wrap;
+    }
+    .trust-item { display: flex; align-items: center; gap: 7px; font-size: .8rem; font-weight: 600; color: var(--s600); }
+    .trust-item i { color: var(--teal); font-size: .95rem; }
 
-        .card-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--slate-100);
-            font-size: 0.78rem;
-        }
-        .card-row:last-child { border-bottom: none; }
-        .card-row-label { color: var(--slate-400); font-weight: 500; }
-        .card-row-val { color: var(--slate-700); font-weight: 600; }
-        .card-row-val.accent { color: var(--teal); }
+    /* ═══════════════════════════════════════════
+       SECTION COMMONS
+    ═══════════════════════════════════════════ */
+    .section-wrap { max-width: 1240px; margin: 0 auto; padding: 96px 56px; }
+    .section-eye {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-size: .7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+        color: var(--teal); margin-bottom: 12px;
+    }
+    .section-eye::before { content: ''; width: 22px; height: 2px; background: var(--teal); display: block; }
+    .section-title { font-size: clamp(1.9rem, 3.5vw, 2.8rem); color: var(--navy); letter-spacing: -.8px; line-height: 1.15; margin-bottom: 12px; }
+    .section-title em { color: var(--teal); font-style: italic; }
+    .section-sub { font-size: .95rem; color: var(--s400); max-width: 480px; line-height: 1.7; }
 
-        /* ── STATS STRIP ── */
-        .stats-strip {
-            position: relative;
-            z-index: 2;
-            background: var(--teal);
-            padding: 28px 56px;
-            display: flex;
-            justify-content: center;
-            gap: 0;
-        }
-        .stat-item {
-            flex: 1;
-            max-width: 220px;
-            text-align: center;
-            padding: 4px 24px;
-            border-right: 1px solid rgba(255,255,255,0.15);
-        }
-        .stat-item:last-child { border-right: none; }
-        .stat-num {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2.4rem;
-            color: #fff;
-            line-height: 1;
-        }
-        .stat-lbl {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.7);
-            font-weight: 500;
-            margin-top: 3px;
-            letter-spacing: 0.3px;
-        }
+    /* ═══════════════════════════════════════════
+       FEATURES
+    ═══════════════════════════════════════════ */
+    .features-sec { background: var(--white); }
+    .feat-card {
+        background: var(--white); border: 1px solid var(--s200); border-radius: var(--r-lg);
+        padding: 26px; height: 100%;
+        transition: all .35s cubic-bezier(.34,1.56,.64,1);
+        position: relative; overflow: hidden; cursor: default;
+    }
+    .feat-card::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, var(--navy), var(--teal));
+        transform: scaleX(0); transform-origin: left; transition: transform .35s ease;
+    }
+    .feat-card:hover { border-color: transparent; box-shadow: var(--sh-lg); transform: translateY(-7px); }
+    .feat-card:hover::before { transform: scaleX(1); }
+    .feat-icon { width: 50px; height: 50px; border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 16px; }
+    .feat-title { font-size: 1.02rem; font-weight: 600; color: var(--navy); margin-bottom: 9px; }
+    .feat-desc { font-size: .84rem; color: var(--s600); line-height: 1.7; }
+    .feat-link {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: .8rem; font-weight: 600; color: var(--teal); margin-top: 14px;
+        text-decoration: none; opacity: 0; transform: translateX(-6px); transition: all .25s;
+    }
+    .feat-card:hover .feat-link { opacity: 1; transform: translateX(0); }
 
-        @keyframes fadeUp {
-            from { opacity:0; transform:translateY(20px); }
-            to   { opacity:1; transform:none; }
-        }
+    /* ═══════════════════════════════════════════
+       HOW IT WORKS
+    ═══════════════════════════════════════════ */
+    .hiw-sec { background: var(--s50); border-top: 1px solid var(--s200); border-bottom: 1px solid var(--s200); }
+    .steps-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; position: relative; margin-top: 56px; }
+    .steps-grid::before {
+        content: ''; position: absolute; top: 28px;
+        left: calc(12.5% + 14px); right: calc(12.5% + 14px);
+        height: 2px; background: linear-gradient(90deg, var(--teal), var(--mint)); z-index: 0;
+    }
+    .step-col { text-align: center; padding: 0 16px; position: relative; }
+    .step-ring {
+        width: 56px; height: 56px; border-radius: 50%; background: var(--navy); color: #fff;
+        font-size: .95rem; font-weight: 700;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 18px; position: relative; z-index: 1;
+        transition: all .3s ease; box-shadow: 0 6px 20px rgba(10,35,66,.25);
+    }
+    .step-ring::after {
+        content: ''; position: absolute; inset: -5px; border-radius: 50%;
+        border: 1px solid rgba(8,145,178,.2);
+        animation: stepRingPulse 3s ease-in-out infinite;
+    }
+    @keyframes stepRingPulse { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.12);opacity:0} }
+    .step-col:hover .step-ring { background: var(--teal); box-shadow: 0 8px 28px rgba(8,145,178,.4); transform: scale(1.1); }
+    .step-title { font-size: 1rem; font-weight: 600; color: var(--navy); margin-bottom: 7px; }
+    .step-desc  { font-size: .82rem; color: var(--s400); line-height: 1.7; }
 
-        /* ── TRUST BADGES ── */
-        .trust-bar {
-            background: var(--slate-50);
-            border-top: 1px solid var(--slate-200);
-            border-bottom: 1px solid var(--slate-200);
-            padding: 18px 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 48px;
-            flex-wrap: wrap;
-        }
-        .trust-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--slate-600);
-        }
-        .trust-item i { color: var(--teal); font-size: 1rem; }
+    /* ═══════════════════════════════════════════
+       ALGORITHMS
+    ═══════════════════════════════════════════ */
+    .algo-sec { background: var(--navy); }
+    .algo-sec .section-title { color: #fff; }
+    .algo-sec .section-sub   { color: rgba(255,255,255,.45); }
+    .algo-sec .section-eye   { color: var(--teal-light); }
+    .algo-sec .section-eye::before { background: var(--teal-light); }
 
-        /* ── SECTION GENERIC ── */
-        .section-wrap {
-            max-width: 1240px;
-            margin: 0 auto;
-            padding: 100px 56px;
-        }
-        .section-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--teal);
-            margin-bottom: 12px;
-        }
-        .section-eyebrow::before {
-            content: '';
-            width: 24px; height: 2px;
-            background: var(--teal);
-            display: block;
-        }
-        .section-title {
-            font-size: clamp(2rem, 3.5vw, 2.8rem);
-            color: var(--navy);
-            letter-spacing: -0.8px;
-            line-height: 1.15;
-            margin-bottom: 12px;
-        }
-        .section-title em { color: var(--teal); font-style: italic; }
-        .section-sub {
-            font-size: 0.95rem;
-            color: var(--slate-400);
-            max-width: 480px;
-            line-height: 1.7;
-            font-weight: 400;
-        }
+    .algo-card {
+        background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+        border-radius: var(--r-lg); padding: 24px;
+        transition: all .3s ease; position: relative; overflow: hidden;
+    }
+    .algo-card:hover {
+        background: rgba(255,255,255,.09); border-color: rgba(8,145,178,.3);
+        transform: translateY(-5px); box-shadow: 0 16px 48px rgba(0,0,0,.3);
+    }
+    .algo-rank  { font-size: .63rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 9px; }
+    .algo-name  { font-size: .98rem; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .algo-type  { font-size: .7rem; color: rgba(255,255,255,.32); margin-bottom: 16px; }
+    .algo-acc   { font-family: 'DM Serif Display', serif; font-size: 2.3rem; line-height: 1; margin-bottom: 12px; }
+    .algo-track { background: rgba(255,255,255,.08); border-radius: 4px; height: 4px; overflow: hidden; }
+    .algo-bar   { height: 100%; border-radius: 4px; animation: barGrow 1s ease both; }
+    .algo-chip  { display: inline-flex; align-items: center; gap: 4px; font-size: .63rem; font-weight: 600; letter-spacing: .5px; padding: 3px 8px; border-radius: 4px; margin-top: 11px; }
 
-        /* ── FEATURES ── */
-        .features-section { background: var(--white); }
-        .features-section .section-wrap { padding-top: 90px; padding-bottom: 90px; }
+    /* ═══════════════════════════════════════════
+       CTA
+    ═══════════════════════════════════════════ */
+    .cta-sec { background: var(--off-white); border-top: 1px solid var(--s200); }
+    .cta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .cta-title { font-size: clamp(2rem, 3.5vw, 3rem); color: var(--navy); letter-spacing: -1px; line-height: 1.15; margin-bottom: 14px; }
+    .cta-title em { color: var(--teal); font-style: italic; }
+    .cta-sub { font-size: .95rem; color: var(--s400); line-height: 1.75; margin-bottom: 30px; }
+    .cta-note { font-size: .77rem; color: var(--s400); margin-top: 12px; }
+    .cta-note a { color: var(--teal); text-decoration: none; font-weight: 500; }
 
-        .feat-card {
-            background: var(--white);
-            border: 1px solid var(--slate-200);
-            border-radius: 16px;
-            padding: 28px;
-            height: 100%;
-            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-            position: relative;
-            overflow: hidden;
-        }
-        .feat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--navy), var(--teal));
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.35s ease;
-        }
-        .feat-card:hover {
-            border-color: transparent;
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-6px);
-        }
-        .feat-card:hover::before { transform: scaleX(1); }
+    .cta-feats { display: flex; flex-direction: column; gap: 14px; }
+    .cta-feat {
+        display: flex; align-items: flex-start; gap: 14px; padding: 16px;
+        background: var(--white); border: 1px solid var(--s200); border-radius: var(--r-md);
+        transition: all .25s;
+    }
+    .cta-feat:hover { border-color: var(--teal); box-shadow: var(--sh-md); transform: translateX(4px); }
+    .cta-feat-icon { width: 38px; height: 38px; border-radius: var(--r-sm); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .cta-feat-title { font-size: .87rem; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+    .cta-feat-desc  { font-size: .77rem; color: var(--s400); }
 
-        .feat-icon {
-            width: 52px; height: 52px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem;
-            margin-bottom: 18px;
-        }
-        .feat-title {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: var(--navy);
-            margin-bottom: 10px;
-        }
-        .feat-desc {
-            font-size: 0.85rem;
-            color: var(--slate-600);
-            line-height: 1.7;
-            font-weight: 400;
-        }
-        .feat-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--teal);
-            margin-top: 16px;
-            text-decoration: none;
-            opacity: 0;
-            transform: translateX(-6px);
-            transition: all 0.25s;
-        }
-        .feat-card:hover .feat-link {
-            opacity: 1;
-            transform: translateX(0);
-        }
+    /* ═══════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════ */
+    footer {
+        background: var(--navy); padding: 26px 56px;
+        display: flex; align-items: center; justify-content: space-between;
+        flex-wrap: wrap; gap: 12px;
+    }
+    .footer-brand { font-family: 'DM Serif Display', serif; font-size: .98rem; color: rgba(255,255,255,.45); }
+    .footer-brand span { color: var(--teal-light); }
+    .footer-note  { font-size: .73rem; color: rgba(255,255,255,.28); text-align: right; }
+    .footer-warn  { font-size: .7rem; color: rgba(255,255,255,.18); margin-top: 2px; }
 
-        /* ── HOW IT WORKS ── */
-        .hiw-section { background: var(--slate-50); border-top: 1px solid var(--slate-200); border-bottom: 1px solid var(--slate-200); }
+    /* ═══════════════════════════════════════════
+       SCROLL REVEAL
+    ═══════════════════════════════════════════ */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .rd1{transition-delay:.08s;} .rd2{transition-delay:.16s;} .rd3{transition-delay:.24s;} .rd4{transition-delay:.32s;}
 
-        .step-wrap {
-            display: grid;
-            grid-template-columns: repeat(4,1fr);
-            gap: 0;
-            position: relative;
-            margin-top: 60px;
-        }
-        /* Connecting line */
-        .step-wrap::before {
-            content: '';
-            position: absolute;
-            top: 28px;
-            left: calc(12.5% + 14px);
-            right: calc(12.5% + 14px);
-            height: 2px;
-            background: linear-gradient(90deg, var(--teal), var(--mint));
-            z-index: 0;
-        }
-        .step-item {
-            text-align: center;
-            padding: 0 16px;
-            position: relative;
-        }
-        .step-circle {
-            width: 56px; height: 56px;
-            border-radius: 50%;
-            background: var(--navy);
-            color: #fff;
-            font-size: 1rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            position: relative;
-            z-index: 1;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(10,35,66,0.25);
-        }
-        .step-item:hover .step-circle {
-            background: var(--teal);
-            box-shadow: 0 8px 28px rgba(8,145,178,0.4);
-            transform: scale(1.1);
-        }
-        .step-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--navy);
-            margin-bottom: 8px;
-        }
-        .step-desc {
-            font-size: 0.82rem;
-            color: var(--slate-400);
-            line-height: 1.7;
-        }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
 
-        /* ── ALGORITHM SECTION ── */
-        .algo-section { background: var(--navy); }
-        .algo-section .section-title { color: #fff; }
-        .algo-section .section-sub { color: rgba(255,255,255,0.5); }
-        .algo-section .section-eyebrow { color: var(--teal-light); }
-        .algo-section .section-eyebrow::before { background: var(--teal-light); }
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media(max-width:900px) {
+        .navbar-hp { padding: 0 20px; }
+        .nav-links  { display: none; }
+        .nav-hamburger { display: flex; }
 
-        .algo-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .algo-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 3px;
-            border-radius: 0 0 16px 16px;
-        }
-        .algo-card:hover {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(8,145,178,0.3);
-            transform: translateY(-4px);
-            box-shadow: 0 16px 48px rgba(0,0,0,0.3);
-        }
-        .algo-rank {
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-        .algo-name {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-        .algo-type {
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.35);
-            margin-bottom: 18px;
-        }
-        .algo-acc {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2.4rem;
-            line-height: 1;
-            margin-bottom: 14px;
-        }
-        .algo-bar-wrap {
-            background: rgba(255,255,255,0.08);
-            border-radius: 4px;
-            height: 4px;
-            overflow: hidden;
-        }
-        .algo-bar {
-            height: 100%;
-            border-radius: 4px;
-            animation: barGrow 1s ease both;
-        }
-        .algo-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            padding: 3px 8px;
-            border-radius: 4px;
-            margin-top: 12px;
-        }
+        .hero-inner { grid-template-columns: 1fr; padding: 110px 24px 60px; gap: 36px; }
+        .hero-right { order: -1; }
+        .card-stack { max-width: 320px; }
+        .hero-title { font-size: clamp(2rem, 8vw, 3rem); }
 
-        /* ── CTA ── */
-        .cta-section {
-            background: var(--off-white);
-            border-top: 1px solid var(--slate-200);
-        }
-        .cta-inner {
-            max-width: 1240px;
-            margin: 0 auto;
-            padding: 100px 56px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: center;
-        }
-        .cta-title {
-            font-size: clamp(2rem, 3.5vw, 3rem);
-            color: var(--navy);
-            letter-spacing: -1px;
-            line-height: 1.15;
-            margin-bottom: 14px;
-        }
-        .cta-title em { color: var(--teal); font-style: italic; }
-        .cta-sub {
-            font-size: 0.95rem;
-            color: var(--slate-400);
-            line-height: 1.75;
-            margin-bottom: 32px;
-        }
-        .cta-note {
-            font-size: 0.78rem;
-            color: var(--slate-400);
-            margin-top: 12px;
-        }
-        .cta-note a { color: var(--teal); text-decoration: none; font-weight: 500; }
+        .stats-strip { padding: 18px 20px; flex-wrap: wrap; }
+        .stat-item { max-width: 50%; border-right: none; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,.1); }
+        .stat-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,.14); }
 
-        .cta-features {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .cta-feat {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            padding: 18px;
-            background: var(--white);
-            border: 1px solid var(--slate-200);
-            border-radius: 12px;
-            transition: all 0.25s ease;
-        }
-        .cta-feat:hover {
-            border-color: var(--teal);
-            box-shadow: var(--shadow-md);
-            transform: translateX(4px);
-        }
-        .cta-feat-icon {
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.05rem;
-        }
-        .cta-feat-title { font-size: 0.88rem; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
-        .cta-feat-desc  { font-size: 0.78rem; color: var(--slate-400); }
-
-        /* ── FOOTER ── */
-        footer {
-            background: var(--navy);
-            padding: 28px 56px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .footer-brand {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1rem;
-            color: rgba(255,255,255,0.5);
-        }
-        .footer-brand span { color: var(--teal-light); }
-        .footer-note {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.3);
-            text-align: right;
-        }
-        .footer-warn {
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.2);
-            margin-top: 2px;
-        }
-
-        /* ── REVEAL ── */
-        .reveal {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.65s ease, transform 0.65s ease;
-        }
-        .reveal.in { opacity: 1; transform: translateY(0); }
-        .reveal-d1 { transition-delay: 0.08s; }
-        .reveal-d2 { transition-delay: 0.16s; }
-        .reveal-d3 { transition-delay: 0.24s; }
-        .reveal-d4 { transition-delay: 0.32s; }
-
-        /* ── RESPONSIVE ── */
-        @media(max-width:900px) {
-            .navbar-hp { padding: 0 20px; }
-            .hero-inner { grid-template-columns: 1fr; padding: 120px 24px 40px; gap: 40px; }
-            .stats-strip { padding: 20px 24px; gap: 0; }
-            .stat-item { max-width: 50%; border-bottom: 1px solid rgba(255,255,255,.12); border-right: none; padding: 14px; }
-            .stat-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,.15); }
-            .trust-bar { gap: 20px; padding: 16px 24px; }
-            .section-wrap { padding: 60px 24px; }
-            .step-wrap { grid-template-columns: 1fr 1fr; }
-            .step-wrap::before { display: none; }
-            .cta-inner { grid-template-columns: 1fr; padding: 60px 24px; gap: 40px; }
-            footer { padding: 24px; flex-direction: column; text-align: center; }
-            .footer-note { text-align: center; }
-        }
+        .trust-bar { padding: 14px 20px; gap: 18px; }
+        .section-wrap { padding: 64px 24px; }
+        .steps-grid { grid-template-columns: 1fr 1fr; row-gap: 36px; }
+        .steps-grid::before { display: none; }
+        .cta-grid { grid-template-columns: 1fr; gap: 40px; }
+        footer { padding: 22px 24px; flex-direction: column; text-align: center; }
+        .footer-note { text-align: center; }
+    }
+    @media(max-width:560px) {
+        .hero-title { font-size: clamp(1.9rem, 9vw, 2.5rem); }
+        .hero-ctas  { flex-direction: column; }
+        .btn-hero-white, .btn-hero-ghost { justify-content: center; width: 100%; }
+        .steps-grid { grid-template-columns: 1fr; }
+        .stat-item  { max-width: 100%; border-right: none; }
+    }
     </style>
 </head>
 <body>
 
-<!-- ── NAVBAR ── -->
+<!-- Particle canvas (hero only) -->
+<canvas id="particles"></canvas>
+
+<!-- ═══ NAVBAR ═══════════════════════════════════════════════════ -->
 <nav class="navbar-hp" id="navbar">
     <a href="/" class="brand">
-        <div class="brand-mark">
-            <i class="bi bi-heart-pulse-fill"></i>
-        </div>
+        <div class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></div>
         <div>
             <span class="brand-name">Health<span>Predict</span></span>
             <span class="brand-badge">AI</span>
         </div>
     </a>
     <div class="nav-links">
-        <a href="#features" class="nav-link-hp">Features</a>
-        <a href="#how-it-works" class="nav-link-hp">How It Works</a>
-        <a href="#algorithms" class="nav-link-hp">Technology</a>
-        <a href="{% url 'login' %}" class="btn-nav-outline">Sign In</a>
-        <a href="{% url 'register_patient' %}" class="btn-nav-primary">
-            <i class="bi bi-person-plus" style="font-size:0.85rem;"></i> Get Started Free
+        <a href="#features"    class="nav-lnk">Features</a>
+        <a href="#how-it-works" class="nav-lnk">How It Works</a>
+        <a href="#algorithms"  class="nav-lnk">Technology</a>
+        <a href="{% url 'login' %}" class="btn-outline-nav">Sign In</a>
+        <a href="{% url 'register_patient' %}" class="btn-primary-nav">
+            <i class="bi bi-person-plus" style="font-size:.84rem;"></i> Get Started Free
         </a>
     </div>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+        <i class="bi bi-list"></i>
+    </button>
 </nav>
 
-<!-- ── HERO ── -->
+<!-- Mobile nav -->
+<div class="mobile-nav" id="mobileNav">
+    <a href="#features"     class="nav-lnk">Features</a>
+    <a href="#how-it-works" class="nav-lnk">How It Works</a>
+    <a href="#algorithms"   class="nav-lnk">Technology</a>
+    <a href="{% url 'login' %}" class="btn-outline-nav">Sign In</a>
+    <a href="{% url 'register_patient' %}" class="btn-primary-nav">
+        <i class="bi bi-person-plus" style="font-size:.84rem;"></i> Get Started Free
+    </a>
+</div>
+
+<!-- ═══ HERO ══════════════════════════════════════════════════════ -->
 <section class="hero">
-    <div class="hero-bg-pattern"></div>
+    <div class="hero-bg"></div>
     <div class="hero-dots"></div>
-    <div class="hero-lines"></div>
+    <div class="hero-rings"></div>
+
+    <!-- EKG line -->
+    <svg class="hero-ekg" viewBox="0 0 1440 40" preserveAspectRatio="none">
+        <path class="hero-ekg-path"
+            d="M0,20 L100,20 L130,20 L145,5 L157,35 L169,5 L181,35 L193,20
+               L240,20 L270,20 L285,8 L297,32 L309,8 L321,32 L333,20 L380,20
+               L410,20 L422,11 L430,29 L438,20 L500,20 L600,20 L720,20
+               L750,20 L765,5 L777,35 L789,5 L801,35 L813,20 L860,20
+               L890,20 L902,10 L910,30 L918,20 L980,20 L1100,20 L1440,20"/>
+    </svg>
 
     <div class="hero-inner">
         <!-- Left -->
@@ -944,7 +581,7 @@
                 specialist recommendations trusted by healthcare professionals.
             </p>
             <div class="hero-ctas">
-                <a href="{% url 'register_patient' %}" class="btn-hero-main">
+                <a href="{% url 'register_patient' %}" class="btn-hero-white">
                     <i class="bi bi-cpu"></i> Start Free Prediction
                 </a>
                 <a href="{% url 'login' %}" class="btn-hero-ghost">
@@ -953,12 +590,12 @@
             </div>
         </div>
 
-        <!-- Right — 3D Card -->
+        <!-- 3D Card -->
         <div class="hero-right">
-            <div class="card-stack">
+            <div class="card-stack" id="heroCard">
                 <div class="main-card">
-                    <div class="card-header-hp">
-                        <div class="card-header-title">
+                    <div class="card-hdr">
+                        <div class="card-hdr-title">
                             <i class="bi bi-cpu" style="color:var(--teal);margin-right:5px;"></i>
                             AI Diagnosis Result
                         </div>
@@ -966,37 +603,32 @@
                             <span class="live-dot"></span> Live Analysis
                         </div>
                     </div>
-
                     <div class="result-disease">Hypertension</div>
-                    <div class="result-conf-row">
-                        <span class="result-conf-num">94.7% Confidence</span>
-                        <div class="result-conf-bar-wrap">
-                            <div class="result-conf-bar" style="width:94.7%;"></div>
-                        </div>
+                    <div class="conf-row">
+                        <span class="conf-num">94.7% Confidence</span>
+                        <div class="conf-track"><div class="conf-fill" style="width:94.7%;"></div></div>
                     </div>
-
                     <div class="result-tags">
                         <span class="rtag rtag-red">High Risk</span>
                         <span class="rtag rtag-teal">Random Forest</span>
                         <span class="rtag rtag-blue">7 Symptoms</span>
                         <span class="rtag rtag-green">Diet Plan Ready</span>
                     </div>
-
-                    <div class="card-row">
-                        <span class="card-row-label">Algorithm Used</span>
-                        <span class="card-row-val accent">Random Forest</span>
+                    <div class="card-data-row">
+                        <span class="cdr-lbl">Algorithm Used</span>
+                        <span class="cdr-val accent">Random Forest</span>
                     </div>
-                    <div class="card-row">
-                        <span class="card-row-label">Specialist Needed</span>
-                        <span class="card-row-val">Cardiologist</span>
+                    <div class="card-data-row">
+                        <span class="cdr-lbl">Specialist Needed</span>
+                        <span class="cdr-val">Cardiologist</span>
                     </div>
-                    <div class="card-row">
-                        <span class="card-row-label">Analysis Time</span>
-                        <span class="card-row-val accent">3 ms</span>
+                    <div class="card-data-row">
+                        <span class="cdr-lbl">Analysis Time</span>
+                        <span class="cdr-val accent">3 ms</span>
                     </div>
-                    <div class="card-row">
-                        <span class="card-row-label">Symptoms Matched</span>
-                        <span class="card-row-val">7 of 132</span>
+                    <div class="card-data-row">
+                        <span class="cdr-lbl">Symptoms Matched</span>
+                        <span class="cdr-val">7 of 132</span>
                     </div>
                 </div>
             </div>
@@ -1033,275 +665,311 @@
     <div class="trust-item"><i class="bi bi-people-fill"></i> Verified Doctors</div>
 </div>
 
-<!-- ── FEATURES ── -->
-<section class="features-section" id="features">
+<!-- ═══ FEATURES ══════════════════════════════════════════════════ -->
+<section class="features-sec" id="features">
     <div class="section-wrap">
-        <div class="reveal" style="text-align:left; margin-bottom:50px;">
-            <div class="section-eyebrow">Core Capabilities</div>
+        <div class="reveal" style="margin-bottom:48px;">
+            <div class="section-eye">Core Capabilities</div>
             <h2 class="section-title">Everything You Need for<br><em>Smart Healthcare</em></h2>
             <p class="section-sub">A complete platform combining AI predictions with actionable, personalized medical guidance.</p>
         </div>
         <div class="row g-4">
-            <div class="col-md-4 reveal reveal-d1">
+            <div class="col-sm-6 col-md-4 reveal rd1">
                 <div class="feat-card">
                     <div class="feat-icon" style="background:#eff6ff;color:#1d4ed8;"><i class="bi bi-cpu"></i></div>
                     <div class="feat-title">ML Disease Prediction</div>
                     <div class="feat-desc">Select symptoms and our Random Forest and Decision Tree models instantly predict the most likely disease with confidence scoring.</div>
-                    <a href="#" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
+                    <a href="{% url 'register_patient' %}" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
-            <div class="col-md-4 reveal reveal-d2">
+            <div class="col-sm-6 col-md-4 reveal rd2">
                 <div class="feat-card">
                     <div class="feat-icon" style="background:var(--teal-pale);color:var(--teal);"><i class="bi bi-bar-chart-line"></i></div>
                     <div class="feat-title">Algorithm Comparison</div>
                     <div class="feat-desc">Compare accuracy of Decision Tree, Random Forest, Naive Bayes, and SVM side by side with interactive visual charts.</div>
-                    <a href="#" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
+                    <a href="{% url 'register_patient' %}" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
-            <div class="col-md-4 reveal reveal-d3">
+            <div class="col-sm-6 col-md-4 reveal rd3">
                 <div class="feat-card">
-                    <div class="feat-icon" style="background:#fffbeb;color:#d97706;"><i class="bi bi-journal-medical"></i></div>
+                    <div class="feat-icon" style="background:#fffbeb;color:var(--amber);"><i class="bi bi-journal-medical"></i></div>
                     <div class="feat-title">Personalized Guidance</div>
                     <div class="feat-desc">Receive tailored precautions, medication suggestions, diet plans, and specialist recommendations for your specific condition.</div>
-                    <a href="#" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
+                    <a href="{% url 'register_patient' %}" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
-            <div class="col-md-4 reveal reveal-d1">
+            <div class="col-sm-6 col-md-4 reveal rd1">
                 <div class="feat-card">
                     <div class="feat-icon" style="background:#fdf4ff;color:#9333ea;"><i class="bi bi-people"></i></div>
                     <div class="feat-title">Doctor Recommendations</div>
                     <div class="feat-desc">Find the right specialist. Browse verified doctors with ratings, specializations, contact details, and availability.</div>
-                    <a href="#" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
+                    <a href="{% url 'register_patient' %}" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
-            <div class="col-md-4 reveal reveal-d2">
+            <div class="col-sm-6 col-md-4 reveal rd2">
                 <div class="feat-card">
-                    <div class="feat-icon" style="background:#fef2f2;color:#dc2626;"><i class="bi bi-file-earmark-pdf"></i></div>
+                    <div class="feat-icon" style="background:#fef2f2;color:var(--red);"><i class="bi bi-file-earmark-pdf"></i></div>
                     <div class="feat-title">PDF Report Export</div>
                     <div class="feat-desc">Download professional clinical-style PDF reports to share with your physician during in-person consultations.</div>
-                    <a href="#" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
+                    <a href="{% url 'register_patient' %}" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
-            <div class="col-md-4 reveal reveal-d3">
+            <div class="col-sm-6 col-md-4 reveal rd3">
                 <div class="feat-card">
                     <div class="feat-icon" style="background:var(--mint-pale);color:var(--mint);"><i class="bi bi-clock-history"></i></div>
                     <div class="feat-title">Prediction History</div>
                     <div class="feat-desc">Track all past predictions, monitor health trends over time, and search your complete medical prediction history with filters.</div>
-                    <a href="#" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
+                    <a href="{% url 'register_patient' %}" class="feat-link">Learn more <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ── HOW IT WORKS ── -->
-<section class="hiw-section" id="how-it-works">
+<!-- ═══ HOW IT WORKS ══════════════════════════════════════════════ -->
+<section class="hiw-sec" id="how-it-works">
     <div class="section-wrap">
         <div class="text-center reveal" style="margin-bottom:0;">
-            <div class="section-eyebrow" style="justify-content:center;">Process</div>
+            <div class="section-eye" style="justify-content:center;">Process</div>
             <h2 class="section-title">How It <em>Works</em></h2>
             <p class="section-sub" style="margin:10px auto 0;">From registration to results in under a minute.</p>
         </div>
-        <div class="step-wrap reveal">
-            <div class="step-item">
-                <div class="step-circle">01</div>
-                <div class="step-title">Register</div>
-                <div class="step-desc">Create your free patient account and complete your medical profile in under 2 minutes.</div>
-            </div>
-            <div class="step-item">
-                <div class="step-circle">02</div>
-                <div class="step-title">Select Symptoms</div>
-                <div class="step-desc">Choose your symptoms from our comprehensive list of 132+ clinically validated options.</div>
-            </div>
-            <div class="step-item">
-                <div class="step-circle">03</div>
-                <div class="step-title">AI Analysis</div>
-                <div class="step-desc">Our ML models analyze the symptom pattern and predict the most likely condition in milliseconds.</div>
-            </div>
-            <div class="step-item">
-                <div class="step-circle">04</div>
-                <div class="step-title">View Results</div>
-                <div class="step-desc">Get a complete report — diagnosis, precautions, diet, medications, and specialist referrals.</div>
-            </div>
+        <div class="steps-grid reveal">
+            <div class="step-col"><div class="step-ring">01</div><div class="step-title">Register</div><div class="step-desc">Create your free patient account and complete your medical profile in under 2 minutes.</div></div>
+            <div class="step-col"><div class="step-ring">02</div><div class="step-title">Select Symptoms</div><div class="step-desc">Choose your symptoms from our comprehensive list of 132+ clinically validated options.</div></div>
+            <div class="step-col"><div class="step-ring">03</div><div class="step-title">AI Analysis</div><div class="step-desc">Our ML models analyze the symptom pattern and predict the most likely condition in milliseconds.</div></div>
+            <div class="step-col"><div class="step-ring">04</div><div class="step-title">View Results</div><div class="step-desc">Get a complete report — diagnosis, precautions, diet, medications, and specialist referrals.</div></div>
         </div>
     </div>
 </section>
 
-<!-- ── ALGORITHMS ── -->
-<section class="algo-section" id="algorithms">
+<!-- ═══ ALGORITHMS ════════════════════════════════════════════════ -->
+<section class="algo-sec" id="algorithms">
     <div class="section-wrap">
-        <div class="text-center reveal" style="margin-bottom:50px;">
-            <div class="section-eyebrow" style="justify-content:center;">Model Performance</div>
+        <div class="text-center reveal" style="margin-bottom:48px;">
+            <div class="section-eye" style="justify-content:center;">Model Performance</div>
             <h2 class="section-title">Four Battle-Tested <em>ML Models</em></h2>
-            <p class="section-sub" style="margin:10px auto 0;color:rgba(255,255,255,0.4);">Ensemble intelligence for maximum diagnostic accuracy.</p>
+            <p class="section-sub" style="margin:10px auto 0;color:rgba(255,255,255,.42);">Ensemble intelligence for maximum diagnostic accuracy.</p>
         </div>
         <div class="row g-4">
-            <div class="col-md-3 reveal reveal-d1">
+            <div class="col-sm-6 col-md-3 reveal rd1">
                 <div class="algo-card" style="border-bottom:3px solid #0ea5e9;">
                     <div class="algo-rank" style="color:#38bdf8;">★ Primary Model</div>
                     <div class="algo-name">Random Forest</div>
                     <div class="algo-type">Ensemble Method</div>
-                    <div class="algo-acc" style="color:#38bdf8;">98.2<span style="font-size:1.2rem;">%</span></div>
-                    <div class="algo-bar-wrap"><div class="algo-bar" style="width:98.2%;background:linear-gradient(90deg,#0ea5e9,#38bdf8);"></div></div>
-                    <div class="algo-chip" style="background:rgba(14,165,233,0.12);color:#38bdf8;">Highest Accuracy</div>
+                    <div class="algo-acc" style="color:#38bdf8;">98.2<span style="font-size:1.1rem;">%</span></div>
+                    <div class="algo-track"><div class="algo-bar" style="width:98.2%;background:linear-gradient(90deg,#0ea5e9,#38bdf8);"></div></div>
+                    <div class="algo-chip" style="background:rgba(14,165,233,.12);color:#38bdf8;">Highest Accuracy</div>
                 </div>
             </div>
-            <div class="col-md-3 reveal reveal-d2">
+            <div class="col-sm-6 col-md-3 reveal rd2">
                 <div class="algo-card" style="border-bottom:3px solid #10b981;">
                     <div class="algo-rank" style="color:#34d399;">Explainable</div>
                     <div class="algo-name">Decision Tree</div>
                     <div class="algo-type">Tree-Based Classifier</div>
-                    <div class="algo-acc" style="color:#34d399;">95.6<span style="font-size:1.2rem;">%</span></div>
-                    <div class="algo-bar-wrap"><div class="algo-bar" style="width:95.6%;background:linear-gradient(90deg,#10b981,#34d399);"></div></div>
-                    <div class="algo-chip" style="background:rgba(16,185,129,0.12);color:#34d399;">Fast & Transparent</div>
+                    <div class="algo-acc" style="color:#34d399;">95.6<span style="font-size:1.1rem;">%</span></div>
+                    <div class="algo-track"><div class="algo-bar" style="width:95.6%;background:linear-gradient(90deg,#10b981,#34d399);"></div></div>
+                    <div class="algo-chip" style="background:rgba(16,185,129,.12);color:#34d399;">Fast & Transparent</div>
                 </div>
             </div>
-            <div class="col-md-3 reveal reveal-d3">
+            <div class="col-sm-6 col-md-3 reveal rd3">
                 <div class="algo-card" style="border-bottom:3px solid #f59e0b;">
                     <div class="algo-rank" style="color:#fbbf24;">Probabilistic</div>
                     <div class="algo-name">Naive Bayes</div>
                     <div class="algo-type">Bayesian Classifier</div>
-                    <div class="algo-acc" style="color:#fbbf24;">91.3<span style="font-size:1.2rem;">%</span></div>
-                    <div class="algo-bar-wrap"><div class="algo-bar" style="width:91.3%;background:linear-gradient(90deg,#f59e0b,#fbbf24);"></div></div>
-                    <div class="algo-chip" style="background:rgba(245,158,11,0.12);color:#fbbf24;">Lightweight & Fast</div>
+                    <div class="algo-acc" style="color:#fbbf24;">91.3<span style="font-size:1.1rem;">%</span></div>
+                    <div class="algo-track"><div class="algo-bar" style="width:91.3%;background:linear-gradient(90deg,#f59e0b,#fbbf24);"></div></div>
+                    <div class="algo-chip" style="background:rgba(245,158,11,.12);color:#fbbf24;">Lightweight & Fast</div>
                 </div>
             </div>
-            <div class="col-md-3 reveal reveal-d4">
+            <div class="col-sm-6 col-md-3 reveal rd4">
                 <div class="algo-card" style="border-bottom:3px solid #8b5cf6;">
                     <div class="algo-rank" style="color:#a78bfa;">High Dimension</div>
                     <div class="algo-name">SVM</div>
                     <div class="algo-type">Support Vector Machine</div>
-                    <div class="algo-acc" style="color:#a78bfa;">96.8<span style="font-size:1.2rem;">%</span></div>
-                    <div class="algo-bar-wrap"><div class="algo-bar" style="width:96.8%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);"></div></div>
-                    <div class="algo-chip" style="background:rgba(139,92,246,0.12);color:#a78bfa;">Kernel Powered</div>
+                    <div class="algo-acc" style="color:#a78bfa;">96.8<span style="font-size:1.1rem;">%</span></div>
+                    <div class="algo-track"><div class="algo-bar" style="width:96.8%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);"></div></div>
+                    <div class="algo-chip" style="background:rgba(139,92,246,.12);color:#a78bfa;">Kernel Powered</div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ── CTA ── -->
-<section class="cta-section">
-    <div class="cta-inner">
-        <div class="reveal">
-            <div class="section-eyebrow">Get Started Today</div>
-            <h2 class="cta-title">Begin Your<br><em>Health Journey</em><br>Right Now</h2>
-            <p class="cta-sub">Join thousands of patients using AI-powered predictions to make smarter, faster healthcare decisions — completely free.</p>
-            <a href="{% url 'register_patient' %}" class="btn-nav-primary" style="font-size:1rem;padding:14px 32px;border-radius:10px;">
-                <i class="bi bi-person-plus"></i> Create Free Account
-            </a>
-            <div class="cta-note">
-                Already registered? <a href="{% url 'login' %}">Sign In →</a>
+<!-- ═══ CTA ══════════════════════════════════════════════════════ -->
+<section class="cta-sec">
+    <div class="section-wrap">
+        <div class="cta-grid">
+            <div class="reveal">
+                <div class="section-eye">Get Started Today</div>
+                <h2 class="cta-title">Begin Your<br><em>Health Journey</em><br>Right Now</h2>
+                <p class="cta-sub">Join thousands using AI-powered predictions to make smarter, faster healthcare decisions — completely free.</p>
+                <a href="{% url 'register_patient' %}" class="btn-primary-nav" style="font-size:.98rem;padding:13px 30px;border-radius:10px;">
+                    <i class="bi bi-person-plus"></i> Create Free Account
+                </a>
+                <div class="cta-note">Already registered? <a href="{% url 'login' %}">Sign In →</a></div>
             </div>
-        </div>
-        <div class="cta-features reveal reveal-d2">
-            <div class="cta-feat">
-                <div class="cta-feat-icon" style="background:var(--teal-pale);color:var(--teal);">
-                    <i class="bi bi-cpu"></i>
+            <div class="cta-feats reveal rd2">
+                <div class="cta-feat">
+                    <div class="cta-feat-icon" style="background:var(--teal-pale);color:var(--teal);"><i class="bi bi-cpu"></i></div>
+                    <div><div class="cta-feat-title">Instant AI Predictions</div><div class="cta-feat-desc">Get accurate disease predictions in milliseconds using 4 ML models.</div></div>
                 </div>
-                <div>
-                    <div class="cta-feat-title">Instant AI Predictions</div>
-                    <div class="cta-feat-desc">Get accurate disease predictions in milliseconds using 4 ML models.</div>
+                <div class="cta-feat">
+                    <div class="cta-feat-icon" style="background:#eff6ff;color:#1d4ed8;"><i class="bi bi-journal-medical"></i></div>
+                    <div><div class="cta-feat-title">Complete Treatment Plan</div><div class="cta-feat-desc">Precautions, diet, medications, and specialist referrals — all included.</div></div>
                 </div>
-            </div>
-            <div class="cta-feat">
-                <div class="cta-feat-icon" style="background:#eff6ff;color:#1d4ed8;">
-                    <i class="bi bi-journal-medical"></i>
-                </div>
-                <div>
-                    <div class="cta-feat-title">Complete Treatment Plan</div>
-                    <div class="cta-feat-desc">Precautions, diet, medications, and specialist referrals — all included.</div>
-                </div>
-            </div>
-            <div class="cta-feat">
-                <div class="cta-feat-icon" style="background:var(--mint-pale);color:var(--mint);">
-                    <i class="bi bi-shield-fill-check"></i>
-                </div>
-                <div>
-                    <div class="cta-feat-title">Private & Secure</div>
-                    <div class="cta-feat-desc">Your health data is encrypted and never shared without your consent.</div>
+                <div class="cta-feat">
+                    <div class="cta-feat-icon" style="background:var(--mint-pale);color:var(--mint);"><i class="bi bi-shield-fill-check"></i></div>
+                    <div><div class="cta-feat-title">Private & Secure</div><div class="cta-feat-desc">Your health data is encrypted and never shared without your consent.</div></div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ── FOOTER ── -->
+<!-- ═══ FOOTER ════════════════════════════════════════════════════ -->
 <footer>
     <div class="footer-brand">
         <i class="bi bi-heart-pulse-fill" style="color:#f43f5e;margin-right:6px;"></i>
         Health<span>Predict</span> AI
     </div>
     <div class="footer-note">
-        <div>© 2026 HealthPredict AI — Final Year Project &middot; Django + scikit-learn</div>
+        <div>© 2026 HealthPredict AI — Final Year Project · Django + scikit-learn</div>
         <div class="footer-warn">⚠ Educational purposes only. Always consult a licensed physician before making any medical decisions.</div>
     </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-/* Navbar scroll */
+/* ── NAVBAR SCROLL ── */
+const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
-    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
 });
 
-/* Smooth scroll for nav links */
+/* ── MOBILE NAV ── */
+const hamburger = document.getElementById('hamburger');
+const mobileNav = document.getElementById('mobileNav');
+hamburger.addEventListener('click', () => {
+    mobileNav.classList.toggle('open');
+    hamburger.querySelector('i').className = mobileNav.classList.contains('open') ? 'bi bi-x-lg' : 'bi bi-list';
+});
+document.querySelectorAll('.mobile-nav a').forEach(a => {
+    a.addEventListener('click', () => {
+        mobileNav.classList.remove('open');
+        hamburger.querySelector('i').className = 'bi bi-list';
+    });
+});
+
+/* ── SMOOTH SCROLL ── */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
-        const target = document.querySelector(a.getAttribute('href'));
-        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     });
 });
 
-/* Counter animation */
-function animCount(el, target, duration = 1500) {
-    const start = performance.now();
-    function step(now) {
-        const p = Math.min((now - start) / duration, 1);
-        const ease = 1 - Math.pow(1 - p, 4);
-        el.textContent = Math.round(target * ease);
-        if (p < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
+/* ── PARTICLE CANVAS (hero only, lightweight) ── */
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+const pts = Array.from({ length: 40 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.2 + 0.3,
+    vx: (Math.random() - .5) * .25,
+    vy: (Math.random() - .5) * .25,
+    a: Math.random() * .4 + .05,
+    c: Math.random() > .5 ? '8,145,178' : '16,185,129'
+}));
+
+let animRunning = true;
+function drawParticles() {
+    if (!animRunning) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pts.forEach((p, i) => {
+        pts.slice(i + 1).forEach(q => {
+            const dx = p.x - q.x, dy = p.y - q.y;
+            const d = Math.sqrt(dx*dx + dy*dy);
+            if (d < 120) {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(8,145,178,${.06 * (1 - d/120)})`;
+                ctx.lineWidth = .5;
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(q.x, q.y);
+                ctx.stroke();
+            }
+        });
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${p.c},${p.a})`;
+        ctx.fill();
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+    });
+    requestAnimationFrame(drawParticles);
 }
-const counterObs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-        if (e.isIntersecting) {
-            animCount(e.target, parseInt(e.target.dataset.target));
-            counterObs.unobserve(e.target);
-        }
-    });
-}, { threshold: 0.5 });
-document.querySelectorAll('.count-up').forEach(el => counterObs.observe(el));
+drawParticles();
 
-/* Scroll reveal */
-const revealObs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); }
-    });
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+/* Stop particles when scrolled past hero to save CPU */
+const hero = document.querySelector('.hero');
+const perfObs = new IntersectionObserver(e => {
+    animRunning = e[0].isIntersecting;
+    if (animRunning) drawParticles();
+}, { threshold: 0 });
+perfObs.observe(hero);
 
-/* 3D tilt on feature cards */
+/* ── HERO CARD MOUSE PARALLAX ── */
+const heroCard = document.getElementById('heroCard');
+if (heroCard && window.innerWidth > 900) {
+    document.addEventListener('mousemove', e => {
+        const xr = (e.clientX / window.innerWidth - .5) * 10;
+        const yr = (e.clientY / window.innerHeight - .5) * 6;
+        heroCard.style.transform = `perspective(900px) rotateY(${xr}deg) rotateX(${-yr}deg)`;
+    });
+}
+
+/* ── FEATURE CARD 3D TILT ── */
 document.querySelectorAll('.feat-card').forEach(card => {
     card.addEventListener('mousemove', e => {
         const r = card.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width - 0.5;
-        const y = (e.clientY - r.top)  / r.height - 0.5;
-        card.style.transform = `translateY(-6px) perspective(500px) rotateY(${x * 6}deg) rotateX(${-y * 5}deg)`;
+        const x = (e.clientX - r.left) / r.width  - .5;
+        const y = (e.clientY - r.top)  / r.height - .5;
+        card.style.transform = `translateY(-7px) perspective(500px) rotateY(${x * 7}deg) rotateX(${-y * 5}deg)`;
     });
     card.addEventListener('mouseleave', () => { card.style.transform = ''; });
 });
 
-/* Mouse parallax on hero card */
-const heroCard = document.querySelector('.card-stack');
-if (heroCard) {
-    document.addEventListener('mousemove', e => {
-        const xr = (e.clientX / window.innerWidth - 0.5) * 10;
-        const yr = (e.clientY / window.innerHeight - 0.5) * 6;
-        heroCard.style.transform = `perspective(800px) rotateY(${xr}deg) rotateX(${-yr}deg)`;
-    });
+/* ── COUNTER ANIMATION ── */
+function animCount(el, target, dur = 1500) {
+    const t0 = performance.now();
+    (function step(now) {
+        const p = Math.min((now - t0) / dur, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 4)));
+        if (p < 1) requestAnimationFrame(step);
+    })(t0);
 }
+const cntObs = new IntersectionObserver(e => {
+    e.forEach(en => {
+        if (en.isIntersecting) {
+            animCount(en.target, parseInt(en.target.dataset.target));
+            cntObs.unobserve(en.target);
+        }
+    });
+}, { threshold: .5 });
+document.querySelectorAll('.count-up').forEach(el => cntObs.observe(el));
+
+/* ── SCROLL REVEAL ── */
+const revObs = new IntersectionObserver(e => {
+    e.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); revObs.unobserve(en.target); } });
+}, { threshold: .1 });
+document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
 </script>
 </body>
 </html>
